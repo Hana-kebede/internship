@@ -1,6 +1,10 @@
-import { Search, Calendar, FileText, Rocket } from "lucide-react";
+import { Search, Calendar, FileText, Rocket, ArrowRight, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Process = () => {
+  const navigate = useNavigate();
+  
   const steps = [
     {
       icon: Search,
@@ -97,13 +101,25 @@ const Process = () => {
             <p className="text-muted-foreground mb-6">
               Let's discuss how we can bring your vision to life with our proven process and expertise.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-semibold hover:bg-primary/90 glow-on-hover smooth-transition">
-                Start Your Project
-              </button>
-              <button className="px-8 py-3 glass-card border-border/50 hover:border-primary/50 rounded-xl font-semibold smooth-transition">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+              <Button 
+                size="lg" 
+                className="group hero-glow glow-on-hover px-10 py-6 text-lg relative overflow-hidden"
+                onClick={() => navigate('/login')}
+              >
+                <span className="relative z-10">Start Your Project</span>
+                <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform relative z-10" />
+                <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary-glow opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="px-10 py-6 text-lg glass-card border-border/50 hover:border-primary/50 group"
+                onClick={() => navigate('/contact')}
+              >
+                <Play className="mr-3 w-6 h-6 group-hover:scale-110 transition-transform" />
                 Schedule Consultation
-              </button>
+              </Button>
             </div>
           </div>
         </div>

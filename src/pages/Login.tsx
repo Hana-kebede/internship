@@ -33,6 +33,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 relative overflow-hidden">
+      {/* Back to Home Button - Top Left */}
+      <div className="absolute top-6 left-6 z-50">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors text-sm glass-card px-4 py-2 rounded-lg border border-border/50 hover:border-primary/50"
+        >
+          ← Back to Home
+        </Link>
+      </div>
+
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-floating"></div>
@@ -184,16 +194,6 @@ const Login = () => {
             </p>
           </CardContent>
         </Card>
-
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link
-            to="/"
-            className="text-muted-foreground hover:text-foreground transition-colors text-sm"
-          >
-            ← Back to Home
-          </Link>
-        </div>
       </div>
     </div>
   );

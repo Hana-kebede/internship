@@ -3,28 +3,16 @@ import { Building2, GraduationCap, Users, Globe } from "lucide-react";
 const Partners = () => {
   const partners = [
     {
-      icon: Building2,
-      name: "Chamber of Commerce",
-      description: "Business Development Partnership",
-      category: "Business"
+      logo: "https://www.hawisoftware.com/wp-content/uploads/elementor/thumbs/logo-pcfbsz248x1e45k9degnbp7eiddat9hpuwwu741fjc.png",
     },
     {
-      icon: GraduationCap, 
-      name: "Kamara School",
-      description: "Educational Technology Solutions",
-      category: "Education"
+      logo: "https://www.hawisoftware.com/wp-content/uploads/elementor/thumbs/122120138_140962094402567_6797834263634698838_n-modified-pcfcavveh9k3cnjms56pu6hm0p33hmlkzkfxexhcyw.png",
     },
     {
-      icon: Users,
-      name: "Enterprise Solutions",
-      description: "Corporate Software Development",
-      category: "Enterprise"
+      logo: "https://www.hawisoftware.com/wp-content/uploads/elementor/thumbs/cropped-chamber-pcfcpdjtube8c8hv5wons0ufpjnt5n4lzaierhzv1k.jpg",
     },
     {
-      icon: Globe,
-      name: "Global Partners",
-      description: "International Collaborations",
-      category: "Global"
+      logo: "https://www.hawisoftware.com/wp-content/uploads/elementor/thumbs/cropped-logwo-scaled-1-126x129-1-pcfcedtrx2cikegocnmq4apdmbua52hm4vuzq0alt4.jpg",
     },
   ];
 
@@ -48,21 +36,16 @@ const Partners = () => {
           {partners.map((partner, index) => (
             <div 
               key={index} 
-              className="glass-card p-6 rounded-2xl border-border/50 hover:border-primary/30 group glow-on-hover text-center animate-fade-in-up"
+              className="glass-card p-8 rounded-2xl border-border/50 hover:border-primary/30 group glow-on-hover text-center animate-fade-in-up flex items-center justify-center"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 spring-transition">
-                <partner.icon className="w-8 h-8 text-primary" />
+              <div className="w-32 h-32 mx-auto group-hover:scale-110 spring-transition">
+                <img 
+                  src={partner.logo} 
+                  alt="Partner Logo"
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <h3 className="text-lg font-semibold mb-2 group-hover:text-primary smooth-transition">
-                {partner.name}
-              </h3>
-              <p className="text-sm text-muted-foreground mb-3">
-                {partner.description}
-              </p>
-              <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-xs rounded-full">
-                {partner.category}
-              </span>
             </div>
           ))}
         </div>

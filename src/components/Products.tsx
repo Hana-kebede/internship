@@ -45,6 +45,26 @@ const Products = () => {
       image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=500&h=300&fit=crop",
       demoUrl: "#",
       githubUrl: "#"
+    },
+    {
+      title: "HawiHR",
+      description: "Comprehensive human resource management system for modern organizations",
+      features: ["Employee Management", "Payroll System", "Performance Tracking", "Leave Management"],
+      status: "Live",
+      category: "HR Software",
+      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=500&h=300&fit=crop",
+      demoUrl: "#",
+      githubUrl: "#"
+    },
+    {
+      title: "HawiWeb",
+      description: "Professional website development and design services for businesses",
+      features: ["Custom Design", "Responsive Layout", "SEO Optimization", "Content Management"],
+      status: "Live",
+      category: "Web Development",
+      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=300&fit=crop",
+      demoUrl: "#",
+      githubUrl: "#"
     }
   ];
 
@@ -84,7 +104,7 @@ const Products = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product, index) => (
             <Card 
               key={index} 

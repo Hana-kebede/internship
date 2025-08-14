@@ -86,8 +86,10 @@ const AdminDashboard = () => {
 
   // When adminProfilePic changes, update context
   useEffect(() => {
-    setUser(prev => prev ? { ...prev, profilePic: adminProfilePic } : prev);
-  }, [adminProfilePic]);
+    if (user) {
+      setUser({ ...user, profilePic: adminProfilePic });
+    }
+  }, [adminProfilePic, user]);
 
   const handleLogout = () => {
     console.log("Admin logged out");
@@ -285,7 +287,7 @@ const AdminDashboard = () => {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="glass-card hover-scale animate-slide-in-up">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -312,20 +314,9 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="glass-card hover-scale animate-slide-in-up" style={{ animationDelay: "0.2s" }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Revenue</p>
-                      <p className="text-3xl font-bold">$284K</p>
-                      <p className="text-sm text-green-600">+8% from last month</p>
-                    </div>
-                    <DollarSign className="h-8 w-8 text-green-500" />
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card className="glass-card hover-scale animate-slide-in-up" style={{ animationDelay: "0.3s" }}>
+
+              <Card className="glass-card hover-scale animate-slide-in-up" style={{ animationDelay: "0.2s" }}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -795,15 +786,57 @@ const AdminDashboard = () => {
           <DialogHeader>
             <DialogTitle>Add New User</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
-            <Input placeholder="Full Name" required />
-            <Input placeholder="Email" type="email" required />
-            <Input placeholder="Company" />
-            <Input placeholder="Role" />
-            <DialogFooter>
-              <Button type="submit">Add User</Button>
-            </DialogFooter>
-          </form>
+                     <form className="space-y-6" onSubmit={e => {
+             e.preventDefault();
+             console.log('New user added');
+             setAddUserOpen(false);
+           }}>
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">User Information</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Full Name *</label>
+                   <Input 
+                     placeholder="Enter full name" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Email Address *</label>
+                   <Input 
+                     placeholder="user@example.com" 
+                     type="email" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Company</label>
+                   <Input 
+                     placeholder="Enter company name" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">User Role</label>
+                   <Input 
+                     placeholder="e.g., Client, Developer" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                   />
+                 </div>
+               </div>
+             </div>
+
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setAddUserOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
+                 Add User
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -843,15 +876,57 @@ const AdminDashboard = () => {
           <DialogHeader>
             <DialogTitle>Add New Project</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
-            <Input placeholder="Project Name" required />
-            <Input placeholder="Client" required />
-            <Input placeholder="Deadline" type="date" />
-            <Input placeholder="Budget" />
-            <DialogFooter>
-              <Button type="submit">Add Project</Button>
-            </DialogFooter>
-          </form>
+                     <form className="space-y-6" onSubmit={e => {
+             e.preventDefault();
+             console.log('New project added');
+             setAddProjectOpen(false);
+           }}>
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">Project Details</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Project Name *</label>
+                   <Input 
+                     placeholder="Enter project name" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Client *</label>
+                   <Input 
+                     placeholder="Enter client name" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Deadline</label>
+                   <Input 
+                     placeholder="Select deadline" 
+                     type="date" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Budget</label>
+                   <Input 
+                     placeholder="e.g., $15,000" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                   />
+                 </div>
+               </div>
+             </div>
+
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setAddProjectOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
+                 Add Project
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -961,15 +1036,55 @@ const AdminDashboard = () => {
           <DialogHeader>
             <DialogTitle>Add New Post</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4">
-            <Input placeholder="Title" required />
-            <Input placeholder="Author" />
-            <Input placeholder="Category" />
-            <Textarea placeholder="Content" />
-            <DialogFooter>
-              <Button type="submit">Add Post</Button>
-            </DialogFooter>
-          </form>
+                     <form className="space-y-6" onSubmit={e => {
+             e.preventDefault();
+             console.log('New blog post added');
+             setAddPostOpen(false);
+           }}>
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">Blog Post Details</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Post Title *</label>
+                   <Input 
+                     placeholder="Enter post title" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Author</label>
+                   <Input 
+                     placeholder="Enter author name" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2 md:col-span-2">
+                   <label className="text-sm font-medium text-foreground">Category</label>
+                   <Input 
+                     placeholder="e.g., Web Development, Mobile Apps" 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2 md:col-span-2">
+                   <label className="text-sm font-medium text-foreground">Content</label>
+                   <Textarea 
+                     placeholder="Write your blog post content here..." 
+                     className="min-h-32 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
+                   />
+                 </div>
+               </div>
+             </div>
+
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setAddPostOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
+                 Add Post
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -990,7 +1105,12 @@ const AdminDashboard = () => {
                     </div>
           )}
           {blogAction.type === 'edit' && blogAction.post && (
-            <form className="space-y-2">
+            <form className="space-y-2" onSubmit={e => {
+              e.preventDefault();
+              // Handle form submission for blog post editing
+              console.log('Blog post updated');
+              setBlogAction({ ...blogAction, open: false });
+            }}>
               <Input defaultValue={blogAction.post.title} />
               <Input defaultValue={blogAction.post.author} />
               <Input defaultValue={blogAction.post.category} />
@@ -1038,28 +1158,78 @@ const AdminDashboard = () => {
           <DialogHeader>
             <DialogTitle>Edit Admin Profile</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4" onSubmit={e => { e.preventDefault(); setAdminProfileEdit(false); }}>
-            <div className="flex flex-col items-center gap-2">
-              <Avatar className="w-20 h-20 cursor-pointer" onClick={() => document.getElementById('admin-profile-edit-pic-input').click()}>
-                <AvatarImage src={adminProfilePic} />
-                <AvatarFallback>AD</AvatarFallback>
-              </Avatar>
-              <input id="admin-profile-edit-pic-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => {
-                const file = e.target.files && e.target.files[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = ev => setAdminProfilePic(ev.target.result as string);
-                  reader.readAsDataURL(file);
-                }
-              }} />
-            </div>
-            <Input value={adminProfileData.name} onChange={e => setAdminProfileData({ ...adminProfileData, name: e.target.value })} placeholder="Name" required />
-            <Input value={adminProfileData.email} onChange={e => setAdminProfileData({ ...adminProfileData, email: e.target.value })} placeholder="Email" type="email" required />
-            <Input value={adminProfileData.role} onChange={e => setAdminProfileData({ ...adminProfileData, role: e.target.value })} placeholder="Role" />
-            <DialogFooter>
-              <Button type="submit">Save Changes</Button>
-            </DialogFooter>
-          </form>
+                     <form className="space-y-6" onSubmit={e => { 
+             e.preventDefault(); 
+             // Handle admin profile update
+             console.log('Admin profile updated:', adminProfileData);
+             setAdminProfileEdit(false); 
+           }}>
+             {/* Profile Picture Section */}
+             <div className="flex flex-col items-center gap-4 p-6 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl border border-dashed border-blue-500/20">
+               <Avatar className="w-24 h-24 cursor-pointer ring-4 ring-blue-500/10 hover:ring-blue-500/30 transition-all duration-300" onClick={() => document.getElementById('admin-profile-edit-pic-input').click()}>
+                 <AvatarImage src={adminProfilePic} />
+                 <AvatarFallback className="text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 text-white">AD</AvatarFallback>
+               </Avatar>
+               <input id="admin-profile-edit-pic-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => {
+                 const file = e.target.files && e.target.files[0];
+                 if (file) {
+                   const reader = new FileReader();
+                   reader.onload = ev => setAdminProfilePic(ev.target.result as string);
+                   reader.readAsDataURL(file);
+                 }
+               }} />
+               <div className="text-center">
+                 <p className="text-sm font-medium text-blue-600">Click to change profile picture</p>
+                 <p className="text-xs text-muted-foreground">JPG, PNG or GIF (max. 2MB)</p>
+               </div>
+             </div>
+
+             {/* Admin Information Section */}
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">Administrator Information</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Full Name *</label>
+                   <Input 
+                     value={adminProfileData.name} 
+                     onChange={e => setAdminProfileData({ ...adminProfileData, name: e.target.value })} 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     placeholder="Enter administrator name"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Email Address *</label>
+                   <Input 
+                     value={adminProfileData.email} 
+                     onChange={e => setAdminProfileData({ ...adminProfileData, email: e.target.value })} 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     placeholder="admin@hawisoftware.com"
+                     type="email" 
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2 md:col-span-2">
+                   <label className="text-sm font-medium text-foreground">Administrator Role</label>
+                   <Input 
+                     value={adminProfileData.role} 
+                     onChange={e => setAdminProfileData({ ...adminProfileData, role: e.target.value })} 
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     placeholder="e.g., System Administrator, Super Admin"
+                   />
+                 </div>
+               </div>
+             </div>
+
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setAdminProfileEdit(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
+                 Save Changes
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
     </div>

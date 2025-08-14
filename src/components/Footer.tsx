@@ -10,12 +10,6 @@ const Footer = () => {
       "Custom Software Development",
       "Mobile App Development"
     ],
-    company: [
-      "About Us",
-      "Our Team",
-      "Careers",
-      "Contact"
-    ],
     resources: [
       "Blog",
       "Case Studies",
@@ -25,15 +19,15 @@ const Footer = () => {
   };
 
   const contactInfo = [
-    { icon: Mail, text: "hello@hawisoftware.com", href: "mailto:hello@hawisoftware.com" },
-    { icon: Phone, text: "+1 (555) 123-4567", href: "tel:+15551234567" },
-    { icon: MapPin, text: "Your City, Country", href: "#" }
+    { icon: Mail, text: "info@hawisoftware.com", href: "mailto:info@hawisoftware.com" },
+    { icon: Phone, text: "+251 900276031", href: "tel:+251900276031" },
+    { icon: MapPin, text: "Harambee Mole 1st floor, ADAMA, ETHIOPIA", href: "#" }
   ];
 
   const socialLinks = [
     { icon: Facebook, href: "https://www.facebook.com/hawisoftware/", label: "Facebook" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Twitter, href: "#", label: "Twitter" }
+    { icon: Linkedin, href: "https://www.linkedin.com/company/hawi-software-solutions/", label: "LinkedIn" },
+    { icon: Twitter, href: "https://twitter.com/hawisoftware", label: "Twitter" }
   ];
 
   return (
@@ -43,14 +37,15 @@ const Footer = () => {
       <div className="absolute bottom-0 right-0 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
       
       <div className="relative z-10 container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center font-bold text-primary-foreground text-xl">
-                H
-              </div>
-              <span className="text-xl font-bold">Hawi Software</span>
+              <img 
+                src="https://www.hawisoftware.com/wp-content/uploads/elementor/thumbs/cropped-logohawi-2-pcfbk6ai9qzrfkcdr3jdhf52biqlr9k6bd27gv33s8.png"
+                alt="Hawi Software"
+                className="h-12 w-auto"
+              />
             </div>
             <p className="text-muted-foreground mb-6 leading-relaxed">
               Transforming ideas into powerful digital solutions with cutting-edge technology and innovative design.
@@ -79,20 +74,6 @@ const Footer = () => {
                 <li key={index}>
                   <a href="#services" className="text-muted-foreground hover:text-primary smooth-transition">
                     {service}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h3 className="text-lg font-semibold mb-6">Company</h3>
-            <ul className="space-y-3">
-              {footerLinks.company.map((item, index) => (
-                <li key={index}>
-                  <a href="#" className="text-muted-foreground hover:text-primary smooth-transition">
-                    {item}
                   </a>
                 </li>
               ))}

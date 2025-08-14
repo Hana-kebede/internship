@@ -24,15 +24,15 @@ const Header = () => {
     { label: "Contact", href: "/contact" },
   ];
 
-  // In Services dropdown, clicking any item or the dropdown itself should navigate to /services
+  // Services dropdown with separate pages for each service
   const serviceItems = [
-    { label: "Brand Identity Development", href: "/services#brand-identity" },
-    { label: "Web Design & Development", href: "/services#web-development" },
-    { label: "Custom Software Development", href: "/services#software-development" },
-    { label: "Mobile Application Development", href: "/services#mobile-development" },
-    { label: "Software Consultancy", href: "/services#software-consultancy" },
-    { label: "Ecommerce", href: "/services#ecommerce" },
-    { label: "Quality assurance and testing", href: "/services#quality-assurance" },
+    { label: "UI/UX Design", href: "/services/ui-ux-design" },
+    { label: "Web Design & Development", href: "/services/web-development" },
+    { label: "Custom Software Development", href: "/services/software-development" },
+    { label: "Mobile Application Development", href: "/services/mobile-development" },
+    { label: "Software Consultancy", href: "/services/software-consultancy" },
+    { label: "Ecommerce", href: "/services/ecommerce" },
+    { label: "Quality Assurance and Testing", href: "/services/quality-assurance" },
   ];
 
   return (

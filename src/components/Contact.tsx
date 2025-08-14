@@ -43,8 +43,8 @@ const Contact = ({ id }: { id?: string }) => {
     {
       icon: Phone,
       title: "Phone",
-      value: "+251 92 378 0440",
-      href: "tel:+251923780440"
+      value: "+251 900276031",
+      href: "tel:+251 900276031"
     },
     {
       icon: Mail,

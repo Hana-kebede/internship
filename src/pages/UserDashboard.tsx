@@ -46,14 +46,14 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const navigate = useNavigate();
   const [editProfileOpen, setEditProfileOpen] = useState(false);
-  const [editProfileData, setEditProfileData] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    phone: "+1 (555) 123-4567",
-    company: "Tech Innovations Inc.",
-    industry: "Technology",
-    role: "CEO"
-  });
+     const [editProfileData, setEditProfileData] = useState({
+     name: "Hana Kebede",
+     email: "hana@example.com",
+     phone: "+251 965059852",
+     company: "Tech Innovations Inc.",
+     industry: "Technology",
+     role: "CEO"
+   });
   const [messagesOpen, setMessagesOpen] = useState(false);
   const [messages, setMessages] = useState([
     { from: "dev", text: "Hello! How can we help you today?" }
@@ -225,7 +225,7 @@ const UserDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {user?.email || "User"}!</h1>
+                     <h1 className="text-3xl font-bold mb-2">Welcome back, Hana!</h1>
           <p className="text-muted-foreground">Here's what's happening with your projects today.</p>
         </div>
 
@@ -242,7 +242,7 @@ const UserDashboard = () => {
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="glass-card hover-scale animate-slide-in-up">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -267,19 +267,9 @@ const UserDashboard = () => {
                 </CardContent>
               </Card>
 
-              <Card className="glass-card hover-scale animate-slide-in-up" style={{ animationDelay: "0.2s" }}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                      <p className="text-3xl font-bold">$19.7K</p>
-                    </div>
-                    <DollarSign className="h-8 w-8 text-green-500" />
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card className="glass-card hover-scale animate-slide-in-up" style={{ animationDelay: "0.3s" }}>
+
+              <Card className="glass-card hover-scale animate-slide-in-up" style={{ animationDelay: "0.2s" }}>
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
@@ -490,29 +480,29 @@ const UserDashboard = () => {
                       reader.readAsDataURL(file);
                     }
                   }} />
-                  <div>
-                    <h3 className="text-xl font-semibold">John Doe</h3>
-                    <p className="text-muted-foreground">john@example.com</p>
-                    <p className="text-sm text-muted-foreground">Tech Startup CEO</p>
-                  </div>
+                                     <div>
+                     <h3 className="text-xl font-semibold">Hana Kebede</h3>
+                     <p className="text-muted-foreground">hana@example.com</p>
+                     <p className="text-sm text-muted-foreground">Tech Startup CEO</p>
+                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-semibold">Personal Information</h4>
                     <div className="space-y-2">
-                      <div>
-                        <label className="text-sm text-muted-foreground">Full Name</label>
-                        <p className="font-medium">John Doe</p>
-                      </div>
-                      <div>
-                        <label className="text-sm text-muted-foreground">Email</label>
-                        <p className="font-medium">john@example.com</p>
-                      </div>
-                      <div>
-                        <label className="text-sm text-muted-foreground">Phone</label>
-                        <p className="font-medium">+1 (555) 123-4567</p>
-                      </div>
+                                             <div>
+                         <label className="text-sm text-muted-foreground">Full Name</label>
+                         <p className="font-medium">Hana Kebede</p>
+                       </div>
+                       <div>
+                         <label className="text-sm text-muted-foreground">Email</label>
+                         <p className="font-medium">hana@example.com</p>
+                       </div>
+                       <div>
+                         <label className="text-sm text-muted-foreground">Phone</label>
+                         <p className="font-medium">+251 965059852</p>
+                       </div>
                     </div>
                   </div>
 
@@ -553,78 +543,115 @@ const UserDashboard = () => {
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
-          <form
-            className="space-y-4"
-            onSubmit={e => {
-              e.preventDefault();
-              setEditProfileOpen(false);
-            }}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <Avatar className="w-20 h-20 cursor-pointer" onClick={() => document.getElementById('edit-profile-pic-input').click()}>
-                <AvatarImage src={profilePic} />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <input id="edit-profile-pic-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => {
-                const file = e.target.files && e.target.files[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = ev => setProfilePic(ev.target.result as string);
-                  reader.readAsDataURL(file);
-                }
-              }} />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm">Full Name</label>
-                <Input
-                  value={editProfileData.name}
-                  onChange={e => setEditProfileData({ ...editProfileData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm">Email</label>
-                <Input
-                  type="email"
-                  value={editProfileData.email}
-                  onChange={e => setEditProfileData({ ...editProfileData, email: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <label className="text-sm">Phone</label>
-                <Input
-                  value={editProfileData.phone}
-                  onChange={e => setEditProfileData({ ...editProfileData, phone: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm">Company</label>
-                <Input
-                  value={editProfileData.company}
-                  onChange={e => setEditProfileData({ ...editProfileData, company: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm">Industry</label>
-                <Input
-                  value={editProfileData.industry}
-                  onChange={e => setEditProfileData({ ...editProfileData, industry: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm">Role</label>
-                <Input
-                  value={editProfileData.role}
-                  onChange={e => setEditProfileData({ ...editProfileData, role: e.target.value })}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Save Changes</Button>
-            </DialogFooter>
-          </form>
+                     <form
+             className="space-y-6"
+             onSubmit={e => {
+               e.preventDefault();
+               // Update the user context with new profile data
+               setUser(prev => prev ? { ...prev, email: editProfileData.email } : prev);
+               setEditProfileOpen(false);
+             }}
+           >
+             {/* Profile Picture Section */}
+             <div className="flex flex-col items-center gap-4 p-6 bg-gradient-to-r from-primary/5 to-secondary/5 rounded-xl border border-dashed border-primary/20">
+               <Avatar className="w-24 h-24 cursor-pointer ring-4 ring-primary/10 hover:ring-primary/30 transition-all duration-300" onClick={() => document.getElementById('edit-profile-pic-input').click()}>
+                 <AvatarImage src={profilePic} />
+                 <AvatarFallback className="text-lg font-semibold">JD</AvatarFallback>
+               </Avatar>
+               <input id="edit-profile-pic-input" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => {
+                 const file = e.target.files && e.target.files[0];
+                 if (file) {
+                   const reader = new FileReader();
+                   reader.onload = ev => setProfilePic(ev.target.result as string);
+                   reader.readAsDataURL(file);
+                 }
+               }} />
+               <div className="text-center">
+                 <p className="text-sm font-medium text-primary">Click to change profile picture</p>
+                 <p className="text-xs text-muted-foreground">JPG, PNG or GIF (max. 2MB)</p>
+               </div>
+             </div>
+
+             {/* Personal Information Section */}
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-primary border-b border-primary/20 pb-2">Personal Information</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Full Name *</label>
+                   <Input
+                     value={editProfileData.name}
+                     onChange={e => setEditProfileData({ ...editProfileData, name: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="Enter your full name"
+                     required
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Email Address *</label>
+                   <Input
+                     type="email"
+                     value={editProfileData.email}
+                     onChange={e => setEditProfileData({ ...editProfileData, email: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="Enter your email address"
+                     required
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Phone Number</label>
+                   <Input
+                     value={editProfileData.phone}
+                     onChange={e => setEditProfileData({ ...editProfileData, phone: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="+1 (555) 123-4567"
+                   />
+                 </div>
+               </div>
+             </div>
+
+             {/* Company Information Section */}
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-primary border-b border-primary/20 pb-2">Company Information</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Company Name</label>
+                   <Input
+                     value={editProfileData.company}
+                     onChange={e => setEditProfileData({ ...editProfileData, company: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="Enter company name"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Industry</label>
+                   <Input
+                     value={editProfileData.industry}
+                     onChange={e => setEditProfileData({ ...editProfileData, industry: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="e.g., Technology, Healthcare"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Job Title</label>
+                   <Input
+                     value={editProfileData.role}
+                     onChange={e => setEditProfileData({ ...editProfileData, role: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="e.g., CEO, Manager"
+                   />
+                 </div>
+               </div>
+             </div>
+
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setEditProfileOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                 Save Changes
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -639,23 +666,26 @@ const UserDashboard = () => {
               <div key={idx} className={`p-2 rounded-lg ${msg.from === "user" ? "bg-primary/10 self-end" : "bg-muted/50 self-start"}`}>{msg.text}</div>
             ))}
           </div>
-          <form
-            className="flex gap-2"
-            onSubmit={e => {
-              e.preventDefault();
-              if (newMessage.trim()) {
-                setMessages([...messages, { from: "user", text: newMessage }]);
-                setNewMessage("");
-              }
-            }}
-          >
-            <Input
-              value={newMessage}
-              onChange={e => setNewMessage(e.target.value)}
-              placeholder="Type your message..."
-            />
-            <Button type="submit">Send</Button>
-          </form>
+                     <form
+             className="flex gap-3 mt-4"
+             onSubmit={e => {
+               e.preventDefault();
+               if (newMessage.trim()) {
+                 setMessages([...messages, { from: "user", text: newMessage }]);
+                 setNewMessage("");
+               }
+             }}
+           >
+             <Input
+               value={newMessage}
+               onChange={e => setNewMessage(e.target.value)}
+               placeholder="Type your message here..."
+               className="flex-1 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+             />
+             <Button type="submit" className="bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 px-6">
+               Send
+             </Button>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -665,45 +695,59 @@ const UserDashboard = () => {
           <DialogHeader>
             <DialogTitle>New Service Request</DialogTitle>
           </DialogHeader>
-          <form
-            className="space-y-4"
-            onSubmit={e => {
-              e.preventDefault();
-              setRequestOpen(false);
-            }}
-          >
-            <div>
-              <label className="text-sm">Title</label>
-              <Input
-                value={newRequest.title}
-                onChange={e => setNewRequest({ ...newRequest, title: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm">Description</label>
-              <Textarea
-                value={newRequest.description}
-                onChange={e => setNewRequest({ ...newRequest, description: e.target.value })}
-                required
-              />
-            </div>
-            <div>
-              <label className="text-sm">Priority</label>
-              <select
-                className="w-full border rounded-md p-2"
-                value={newRequest.priority}
-                onChange={e => setNewRequest({ ...newRequest, priority: e.target.value })}
-              >
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-              </select>
-            </div>
-            <DialogFooter>
-              <Button type="submit">Submit Request</Button>
-            </DialogFooter>
-          </form>
+                     <form
+             className="space-y-6"
+             onSubmit={e => {
+               e.preventDefault();
+               setRequestOpen(false);
+             }}
+           >
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-primary border-b border-primary/20 pb-2">Service Request Details</h3>
+               <div className="space-y-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Request Title *</label>
+                   <Input
+                     value={newRequest.title}
+                     onChange={e => setNewRequest({ ...newRequest, title: e.target.value })}
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     placeholder="Enter request title"
+                     required
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Description *</label>
+                   <Textarea
+                     value={newRequest.description}
+                     onChange={e => setNewRequest({ ...newRequest, description: e.target.value })}
+                     className="min-h-24 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
+                     placeholder="Describe your request in detail..."
+                     required
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Priority Level</label>
+                   <select
+                     className="w-full h-11 border border-primary/20 rounded-md px-3 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 bg-background"
+                     value={newRequest.priority}
+                     onChange={e => setNewRequest({ ...newRequest, priority: e.target.value })}
+                   >
+                     <option value="High">🚨 High Priority</option>
+                     <option value="Medium">⚡ Medium Priority</option>
+                     <option value="Low">📋 Low Priority</option>
+                   </select>
+                 </div>
+               </div>
+             </div>
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setRequestOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                 Submit Request
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -768,42 +812,65 @@ const UserDashboard = () => {
           <DialogHeader>
             <DialogTitle>Provide Feedback</DialogTitle>
           </DialogHeader>
-          <form
-            className="space-y-4"
-            onSubmit={e => {
-              e.preventDefault();
-              setReviews([{ project: "Your Feedback", rating: feedback.rating, testimonial: feedback.text }, ...reviews]);
-              setFeedback({ rating: 5, text: "" });
-              setFeedbackOpen(false);
-            }}
-          >
-            <div>
-              <label className="text-sm">Rating</label>
-              <div className="flex gap-1 mt-1">
-                {[1,2,3,4,5].map(star => (
-                  <button
-                    type="button"
-                    key={star}
-                    className={star <= feedback.rating ? "text-yellow-500" : "text-gray-300"}
-                    onClick={() => setFeedback(f => ({ ...f, rating: star }))}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div>
-              <label className="text-sm">Feedback</label>
-              <Textarea
-                value={feedback.text}
-                onChange={e => setFeedback(f => ({ ...f, text: e.target.value }))}
-                required
-              />
-            </div>
-            <DialogFooter>
-              <Button type="submit">Submit</Button>
-            </DialogFooter>
-          </form>
+                     <form
+             className="space-y-6"
+             onSubmit={e => {
+               e.preventDefault();
+               setReviews([{ project: "Your Feedback", rating: feedback.rating, testimonial: feedback.text }, ...reviews]);
+               setFeedback({ rating: 5, text: "" });
+               setFeedbackOpen(false);
+             }}
+           >
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-primary border-b border-primary/20 pb-2">Share Your Experience</h3>
+               <div className="space-y-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Rate Your Experience</label>
+                   <div className="flex gap-2 mt-2">
+                     {[1,2,3,4,5].map(star => (
+                       <button
+                         type="button"
+                         key={star}
+                         className={`text-2xl transition-all duration-200 hover:scale-110 ${
+                           star <= feedback.rating 
+                             ? "text-yellow-500 animate-pulse" 
+                             : "text-gray-300 hover:text-yellow-300"
+                         }`}
+                         onClick={() => setFeedback(f => ({ ...f, rating: star }))}
+                       >
+                         {star <= feedback.rating ? "⭐" : "☆"}
+                       </button>
+                     ))}
+                   </div>
+                   <p className="text-xs text-muted-foreground mt-1">
+                     {feedback.rating === 1 && "Poor"}
+                     {feedback.rating === 2 && "Fair"}
+                     {feedback.rating === 3 && "Good"}
+                     {feedback.rating === 4 && "Very Good"}
+                     {feedback.rating === 5 && "Excellent"}
+                   </p>
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Your Feedback *</label>
+                   <Textarea
+                     value={feedback.text}
+                     onChange={e => setFeedback(f => ({ ...f, text: e.target.value }))}
+                     className="min-h-24 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 resize-none"
+                     placeholder="Tell us about your experience with our services..."
+                     required
+                   />
+                 </div>
+               </div>
+             </div>
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setFeedbackOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                 Submit Feedback
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
 
@@ -813,17 +880,84 @@ const UserDashboard = () => {
           <DialogHeader>
             <DialogTitle>New Project</DialogTitle>
           </DialogHeader>
-          <form className="space-y-4" onSubmit={e => { e.preventDefault(); setNewProjectOpen(false); }}>
-            <Input placeholder="Project Name" value={newProject.name} onChange={e => setNewProject({ ...newProject, name: e.target.value })} required />
-            <Input placeholder="Status" value={newProject.status} onChange={e => setNewProject({ ...newProject, status: e.target.value })} />
-            <Input placeholder="Progress" type="number" value={newProject.progress} onChange={e => setNewProject({ ...newProject, progress: Number(e.target.value) })} />
-            <Input placeholder="Deadline" type="date" value={newProject.deadline} onChange={e => setNewProject({ ...newProject, deadline: e.target.value })} />
-            <Input placeholder="Budget" value={newProject.budget} onChange={e => setNewProject({ ...newProject, budget: e.target.value })} />
-            <Input placeholder="Spent" value={newProject.spent} onChange={e => setNewProject({ ...newProject, spent: e.target.value })} />
-            <DialogFooter>
-              <Button type="submit">Add Project</Button>
-            </DialogFooter>
-          </form>
+                     <form className="space-y-6" onSubmit={e => { e.preventDefault(); setNewProjectOpen(false); }}>
+             <div className="space-y-4">
+               <h3 className="text-lg font-semibold text-primary border-b border-primary/20 pb-2">Project Information</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Project Name *</label>
+                   <Input 
+                     placeholder="Enter project name" 
+                     value={newProject.name} 
+                     onChange={e => setNewProject({ ...newProject, name: e.target.value })} 
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                     required 
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Project Status</label>
+                   <select
+                     className="w-full h-11 border border-primary/20 rounded-md px-3 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 bg-background"
+                     value={newProject.status}
+                     onChange={e => setNewProject({ ...newProject, status: e.target.value })}
+                   >
+                     <option value="Planning">📋 Planning</option>
+                     <option value="In Progress">🚀 In Progress</option>
+                     <option value="Review">👀 Review</option>
+                     <option value="Completed">✅ Completed</option>
+                   </select>
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Progress (%)</label>
+                   <Input 
+                     placeholder="0-100" 
+                     type="number" 
+                     min="0" 
+                     max="100"
+                     value={newProject.progress} 
+                     onChange={e => setNewProject({ ...newProject, progress: Number(e.target.value) })} 
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Deadline</label>
+                   <Input 
+                     placeholder="Select deadline" 
+                     type="date" 
+                     value={newProject.deadline} 
+                     onChange={e => setNewProject({ ...newProject, deadline: e.target.value })} 
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Budget</label>
+                   <Input 
+                     placeholder="e.g., $15,000" 
+                     value={newProject.budget} 
+                     onChange={e => setNewProject({ ...newProject, budget: e.target.value })} 
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                   />
+                 </div>
+                 <div className="space-y-2">
+                   <label className="text-sm font-medium text-foreground">Amount Spent</label>
+                   <Input 
+                     placeholder="e.g., $8,500" 
+                     value={newProject.spent} 
+                     onChange={e => setNewProject({ ...newProject, spent: e.target.value })} 
+                     className="h-11 border-primary/20 focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                   />
+                 </div>
+               </div>
+             </div>
+             <DialogFooter className="pt-4 border-t border-border">
+               <Button variant="outline" onClick={() => setNewProjectOpen(false)} className="px-6">
+                 Cancel
+               </Button>
+               <Button type="submit" className="px-6 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70">
+                 Add Project
+               </Button>
+             </DialogFooter>
+           </form>
         </DialogContent>
       </Dialog>
     </div>

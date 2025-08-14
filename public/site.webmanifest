@@ -1,0 +1,21 @@
+{
+  "name": "Hawi Software Solutions",
+  "short_name": "Hawi Software",
+  "description": "Transforming ideas into powerful digital solutions with cutting-edge technology and innovative design",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f23",
+  "theme_color": "#ff6b35",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
