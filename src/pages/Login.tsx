@@ -20,9 +20,23 @@ const Login = () => {
     e.preventDefault();
     // Simulate login logic
     console.log("Login attempt:", { email, password, rememberMe });
-    const role = email === 'admin@hawi.com' ? 'admin' : 'user';
+    
+    // Determine user role based on email
+    let role = 'user';
+    if (email === 'admin@hawi.com') {
+      role = 'admin';
+    } else if (email === 'michael@hawisoft.com' || email.includes('@hawisoft.com')) {
+      role = 'team';
+    }
+    
     setUser({ email, role, profilePic: undefined });
-    navigate(role === 'admin' ? '/admin' : '/dashboard');
+    
+    // Navigate based on role
+    if (role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   const handleSocialLogin = (provider: 'google' | 'facebook') => {

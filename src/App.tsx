@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import UserDashboard from "./pages/UserDashboard";
+
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import Blog from "./pages/Blog";
@@ -146,6 +147,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/dashboard" element={<UserDashboard />} />
+
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/services/ui-ux-design" element={<UIUXDesign />} />
