@@ -75,7 +75,6 @@ const AdminDashboard = () => {
   const [newUser, setNewUser] = useState({
     fullName: "",
     email: "",
-    password: "",
     role: "",
     department: "",
     status: "Active",
@@ -343,14 +342,6 @@ const AdminDashboard = () => {
       errors.email = "Please enter a valid email address";
     }
 
-    if (!newUser.password) {
-      errors.password = "Password is required";
-    } else if (newUser.password.length < 8) {
-      errors.password = "Password must be at least 8 characters long";
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(newUser.password)) {
-      errors.password = "Password must contain at least one uppercase letter, one lowercase letter, and one number";
-    }
-
     if (!newUser.role) {
       errors.role = "Please select a user role";
     }
@@ -383,7 +374,6 @@ const AdminDashboard = () => {
       setNewUser({
         fullName: "",
         email: "",
-        password: "",
         role: "",
         department: "",
         status: "Active",
@@ -1121,7 +1111,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Performance Metrics Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="glass-card">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
@@ -1141,32 +1131,6 @@ const AdminDashboard = () => {
                       <p className="text-3xl font-bold">{teamMembersData.filter(m => m.status === "Active").length}</p>
                     </div>
                     <CheckCircle className="h-8 w-8 text-green-500" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="glass-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Avg Performance</p>
-                      <p className="text-3xl font-bold">
-                        {Math.round(teamMembersData.reduce((acc, m) => acc + m.performance, 0) / teamMembersData.length)}%
-                      </p>
-                    </div>
-                    <TrendingUp className="h-8 w-8 text-purple-500" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="glass-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Total Tasks</p>
-                      <p className="text-3xl font-bold">
-                        {teamMembersData.reduce((acc, m) => acc + m.completedTasks, 0)}
-                      </p>
-                    </div>
-                    <Target className="h-8 w-8 text-orange-500" />
                   </div>
                 </CardContent>
               </Card>
@@ -2035,28 +1999,7 @@ const AdminDashboard = () => {
                     {userFormErrors.email && <p className="text-xs text-red-500">{userFormErrors.email}</p>}
                  </div>
                   
-                 <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-foreground">Password</label>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Create a secure password (min 8 chars, uppercase, lowercase, number)</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                   <Input 
-                      placeholder="Create a secure password" 
-                      type="password" 
-                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                      value={newUser.password}
-                      onChange={e => setNewUser(prev => ({ ...prev, password: e.target.value }))}
-                      required 
-                   />
-                    {userFormErrors.password && <p className="text-xs text-red-500">{userFormErrors.password}</p>}
-                 </div>
+
                   
                  <div className="space-y-2">
                     <div className="flex items-center gap-2">
