@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import { authService } from "@/lib/services";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, Building, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,8 @@ const Signup = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate signup logic
-    console.log("Signup attempt:", formData);
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords don't match!");
       return;
@@ -40,9 +39,25 @@ const Signup = () => {
       alert("Please agree to the terms and conditions!");
       return;
     }
-    const role = formData.email === 'admin@hawi.com' ? 'admin' : 'user';
-    setUser({ email: formData.email, role, profilePic: undefined });
-    navigate(role === 'admin' ? '/admin' : '/dashboard');
+    // Prepare data for backend
+    const payload = {
+      name: formData.firstName + ' ' + formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      password_confirmation: formData.confirmPassword,
+      company: formData.company
+    };
+    try {
+      const result = await authService.register(payload);
+      if (result.success) {
+        alert("Signup successful! Please log in.");
+        navigate("/login");
+      } else {
+        alert(result.error || "Signup failed");
+      }
+    } catch (err) {
+      alert("Signup failed. Please try again.");
+    }
   };
 
   const handleSocialSignup = (provider: 'google' | 'facebook') => {

@@ -1,4 +1,9 @@
 import { useState } from "react";
+// ...existing code...
+// Error state for API failures
+// Must be declared inside the component function
+// Error state for API failures
+// (moved after imports)
 import { Link, useNavigate } from "react-router-dom";
 import {
   User,
@@ -67,10 +72,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { UserContext } from "@/App";
+import { projectService, serviceRequestService, messageService } from "@/lib/services";
+import { useSharedDataStore, dashboardCommunication } from "@/lib/sharedDataService";
 
 const UserDashboard = () => {
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserContext);
   const [activeTab, setActiveTab] = useState("overview");
@@ -88,6 +96,48 @@ const UserDashboard = () => {
   const [messageAction, setMessageAction] = useState({ open: false, type: '', message: null });
   const [newProjectAction, setNewProjectAction] = useState({ open: false, type: '', project: null });
   const [notificationOpen, setNotificationOpen] = useState(false);
+
+  // Shared data store for communication with AdminDashboard
+  const { 
+    currentUser,
+    userProjects,
+    userServiceRequests,
+    userMessages,
+    systemUpdates,
+    updateUserProjects,
+    updateUserServiceRequests,
+    updateUserMessages
+  } = useSharedDataStore();
+
+  // Ensure user object has 'id' property for type safety
+  type UserWithId = { id: string; email: string; role: string; profilePic?: string };
+  const typedUser = user as UserWithId | null;
+
+  // Set up communication with AdminDashboard
+  useEffect(() => {
+    // Notify admin when user performs actions
+    const notifyAdmin = (actionType: string, data: any) => {
+      dashboardCommunication.notifyAdminOfUserAction(typedUser?.id || 'unknown', actionType, data);
+    };
+
+    // Listen for system updates from AdminDashboard
+    const unsubscribeSystemUpdate = dashboardCommunication.subscribe('system-updated', (data) => {
+      console.log('User received system update:', data);
+      // You can show these updates in the user dashboard
+    });
+
+    // Listen for user updates from AdminDashboard
+    const unsubscribeUserUpdate = dashboardCommunication.subscribe('user-updated', (data) => {
+      console.log('User received update:', data);
+      // Update local state if needed
+    });
+
+    // Cleanup subscriptions
+    return () => {
+      unsubscribeSystemUpdate();
+      unsubscribeUserUpdate();
+    };
+  }, [typedUser?.id]);
 
   // Sample notifications data
   const notifications = [
@@ -117,124 +167,86 @@ const UserDashboard = () => {
     }
   ];
 
-  // Sample user data
-  const userData = {
-    id: 1,
-    name: "Hana Kebede",
-    email: "hani@example.com",
-    phone: "+251 912345678",
-    role: "Client",
-    company: "ABC Corporation",
-    profilePic: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-    joinedDate: "2024-01-15",
-    projects: 2,
-    totalSpent: 15000,
-    status: "Active"
-  };
+  // User profile state
+  const [userData, setUserData] = useState<any>(null);
+  const [profileImageUrl, setProfileImageUrl] = useState("");
+  const [userLoading, setUserLoading] = useState(true);
 
-  const [profileImageUrl, setProfileImageUrl] = useState(userData.profilePic);
+  // Projects state
+  const [projects, setProjects] = useState([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
 
-  // Sample projects data
-  const projects = [
-    {
-      id: 1,
-      title: "E-commerce Website",
-      status: "In Progress",
-      progress: 75,
-      priority: "High",
-      budget: 8000,
-      spent: 6000,
-      startDate: "2024-01-15",
-      endDate: "2024-03-15",
-      description: "Building a modern e-commerce platform with payment integration"
-    },
-    {
-      id: 2,
-      title: "Mobile App Development",
-      status: "Planning",
-      progress: 25,
-      priority: "Medium",
-      budget: 12000,
-      spent: 3000,
-      startDate: "2024-02-01",
-      endDate: "2024-05-01",
-      description: "Creating a mobile application for iOS and Android platforms"
-    },
-    {
-      id: 3,
-      title: "CRM System Integration",
-      status: "Review",
-      progress: 90,
-      priority: "High",
-      budget: 15000,
-      spent: 13500,
-      startDate: "2023-12-01",
-      endDate: "2024-02-28",
-      description: "Custom CRM system with advanced reporting features"
-    },
-    {
-      id: 4,
-      title: "UI/UX Redesign",
-      status: "Testing",
-      progress: 85,
-      priority: "Low",
-      budget: 5000,
-      spent: 4250,
-      startDate: "2024-01-20",
-      endDate: "2024-03-20",
-      description: "Complete redesign of user interface and user experience"
-    }
-  ];
+  // Service requests state
+  const [serviceRequests, setServiceRequests] = useState([]);
+  const [serviceRequestsLoading, setServiceRequestsLoading] = useState(true);
 
-  // Sample service requests data
-  const serviceRequests = [
-    {
-      id: 1,
-      title: "Bug Fix Request",
-      description: "Login page not working properly",
-      priority: "High",
-      status: "In Progress",
-      submittedDate: "2024-01-20",
-      feedback: {
-        rating: 4,
-        satisfaction: "Very Satisfied",
-        comment: "Quick response and resolution"
+  // Messages state
+  const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
+  // Fetch data from backend on mount
+  useEffect(() => {
+    setProjectsLoading(true);
+    setServiceRequestsLoading(true);
+    setMessagesLoading(true);
+    setUserLoading(true);
+    setError(null);
+
+    projectService.getProjects().then(res => {
+      if (res.success) {
+        setProjects(res.data);
+      } else {
+        setError(res.error || 'Failed to load projects');
       }
-    },
-    {
-      id: 2,
-      title: "Feature Enhancement",
-      description: "Add dark mode to the application",
-      priority: "Medium",
-      status: "Pending",
-      submittedDate: "2024-01-18",
-      feedback: {
-        rating: 5,
-        satisfaction: "Extremely Satisfied",
-        comment: "Excellent communication throughout the process"
-      }
-    }
-  ];
+      setProjectsLoading(false);
+    }).catch(() => {
+      setError('Failed to load projects');
+      setProjectsLoading(false);
+    });
 
-  // Sample messages data
-  const messages = [
-    {
-      id: 1,
-      from: "Michael Chen",
-      subject: "Project Update - E-commerce Website",
-      message: "Hi John, I wanted to update you on the progress of your e-commerce website...",
-      timestamp: "2 hours ago",
-      read: false
-    },
-    {
-      id: 2,
-      from: "Sarah Johnson",
-      subject: "Design Review Meeting",
-      message: "Hello! We'd like to schedule a design review meeting for next week...",
-      timestamp: "1 day ago",
-      read: true
+    serviceRequestService.getServiceRequests().then(res => {
+      if (res.success) {
+        setServiceRequests(res.data);
+      } else {
+        setError(res.error || 'Failed to load service requests');
+      }
+      setServiceRequestsLoading(false);
+    }).catch(() => {
+      setError('Failed to load service requests');
+      setServiceRequestsLoading(false);
+    });
+
+    messageService.getMessages && messageService.getMessages().then(res => {
+      if (res.success) {
+        setMessages(res.data);
+      } else {
+        setError(res.error || 'Failed to load messages');
+      }
+      setMessagesLoading(false);
+    }).catch(() => {
+      setError('Failed to load messages');
+      setMessagesLoading(false);
+    });
+
+    // Fetch user profile
+    if (user) {
+      import("@/lib/services").then(({ userService }) => {
+        userService.getProfile().then(res => {
+          if (res.success) {
+            setUserData(res.data);
+            setProfileImageUrl(res.data.profilePic || "");
+          } else {
+            setError(res.error || 'Failed to load user profile');
+          }
+          setUserLoading(false);
+        }).catch(() => {
+          setError('Failed to load user profile');
+          setUserLoading(false);
+        });
+      });
+    } else {
+      setUserLoading(false);
     }
-  ];
+  }, [user]);
 
   // Sample feedback data
   const feedback = [
@@ -271,11 +283,22 @@ const UserDashboard = () => {
 
   // State for profile edit
   const [editProfile, setEditProfile] = useState({
-    name: userData.name,
-    email: userData.email,
-    phone: userData.phone,
-    company: userData.company
+    name: "",
+    email: "",
+    phone: "",
+    company: ""
   });
+
+  useEffect(() => {
+    if (userData) {
+      setEditProfile({
+        name: userData.name || "",
+        email: userData.email || "",
+        phone: userData.phone || "",
+        company: userData.company || ""
+      });
+    }
+  }, [userData]);
 
   // State for password change
   const [passwordChange, setPasswordChange] = useState({
@@ -362,6 +385,20 @@ const UserDashboard = () => {
   const handleSubmitServiceRequest = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('New service request:', newServiceRequest);
+    
+    // Notify admin dashboard of new service request
+    dashboardCommunication.notifyAdminOfServiceRequestAction(
+      newServiceRequest.title || 'unknown', // requestId
+      'new-request',
+      {
+        title: newServiceRequest.title,
+        priority: newServiceRequest.priority,
+        category: newServiceRequest.category,
+        urgency: newServiceRequest.urgency,
+        submittedDate: new Date().toISOString().split('T')[0]
+      }
+    );
+    
     setNewServiceRequest({
       title: "",
       description: "",
@@ -410,6 +447,19 @@ const UserDashboard = () => {
   const handleSubmitProject = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('New project submission:', newProject);
+    
+    // Notify admin dashboard of new project submission
+    dashboardCommunication.notifyAdminOfProjectAction(
+      newProject.title || 'unknown', // projectId
+      'new-project',
+      {
+        title: newProject.title,
+        projectType: newProject.projectType,
+        timeline: newProject.timeline,
+        submittedDate: newProject.submittedDate
+      }
+    );
+    
     setNewProject({
       title: "",
       description: "",
@@ -477,6 +527,13 @@ const UserDashboard = () => {
     ));
   };
 
+  if (projectsLoading || serviceRequestsLoading || messagesLoading || userLoading) {
+    return <div className="flex items-center justify-center min-h-screen">Loading dashboard...</div>;
+  }
+  if (error) {
+    return <div className="flex items-center justify-center min-h-screen text-red-600 font-bold">{error}</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
       {/* Header */}
@@ -499,7 +556,7 @@ const UserDashboard = () => {
               </Button>
               <Avatar onClick={() => setEditProfileOpen(true)} className="cursor-pointer hover:opacity-80 transition-opacity">
                 <AvatarImage src={profileImageUrl} />
-                <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                <AvatarFallback>{userData && userData.name ? userData.name.split(' ').map(n => n[0]).join('') : "U"}</AvatarFallback>
               </Avatar>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                     <LogOut className="h-4 w-4 mr-2" />
@@ -512,7 +569,7 @@ const UserDashboard = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, Hana</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {userData ? userData.name : "User"}</h1>
           <p className="text-muted-foreground">Manage your projects and communicate with our team.</p>
         </div>
 
@@ -627,10 +684,10 @@ const UserDashboard = () => {
                           <div className="flex items-center space-x-3">
                             <Avatar className="h-8 w-8">
                               <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face" />
-                              <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                              <AvatarFallback>{userData && userData.name ? userData.name.split(' ').map(n => n[0]).join('') : "U"}</AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className="font-medium">{userData.name}</div>
+                              <div className="font-medium">{userData ? userData.name : "User"}</div>
                               <div className="text-sm text-muted-foreground">Client</div>
                             </div>
                           </div>
@@ -953,7 +1010,7 @@ const UserDashboard = () => {
                         onClick={() => document.getElementById('profile-image-input')?.click()}
                       >
                         <AvatarImage src={profileImageUrl} />
-                        <AvatarFallback className="text-lg">{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        <AvatarFallback className="text-lg">{userData && userData.name ? userData.name.split(' ').map(n => n[0]).join('') : 'U'}</AvatarFallback>
                   </Avatar>
                       <input
                         id="profile-image-input"
@@ -964,8 +1021,8 @@ const UserDashboard = () => {
                       />
                     </div>
                     <div className="space-y-2">
-                      <h3 className="text-xl font-semibold">{userData.name}</h3>
-                      <p className="text-sm text-muted-foreground">{userData.role}</p>
+                      <h3 className="text-xl font-semibold">{userData && userData.name ? userData.name : 'User'}</h3>
+                      <p className="text-sm text-muted-foreground">{userData && userData.role ? userData.role : ''}</p>
                    </div>
                 </div>
 
@@ -974,21 +1031,21 @@ const UserDashboard = () => {
                       <Mail className="h-5 w-5 text-blue-600" />
                       <div>
                         <p className="text-sm font-medium">Email</p>
-                        <p className="text-sm text-muted-foreground">{userData.email}</p>
+                        <p className="text-sm text-muted-foreground">{userData ? userData.email : ""}</p>
                        </div>
                        </div>
                     <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
                       <Phone className="h-5 w-5 text-green-600" />
                       <div>
                         <p className="text-sm font-medium">Phone</p>
-                        <p className="text-sm text-muted-foreground">{userData.phone}</p>
+                        <p className="text-sm text-muted-foreground">{userData ? userData.phone : ""}</p>
                        </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
                       <Building className="h-5 w-5 text-purple-600" />
                       <div>
                         <p className="text-sm font-medium">Company</p>
-                        <p className="text-sm text-muted-foreground">{userData.company}</p>
+                        <p className="text-sm text-muted-foreground">{userData ? userData.company : ""}</p>
                       </div>
                     </div>
                     

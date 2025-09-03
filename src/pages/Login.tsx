@@ -1,4 +1,5 @@
 import { useState, useContext } from "react";
+import { auth as apiAuth, endpoints, apiClient } from "@/lib/api";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,29 +14,39 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { setUser } = useContext(UserContext);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login logic
-    console.log("Login attempt:", { email, password, rememberMe });
-    
-    // Determine user role based on email
-    let role = 'user';
-    if (email === 'admin@hawi.com') {
-      role = 'admin';
-    } else if (email === 'michael@hawisoft.com' || email.includes('@hawisoft.com')) {
-      role = 'team';
-    }
-    
-    setUser({ email, role, profilePic: undefined });
-    
-    // Navigate based on role
-    if (role === 'admin') {
-      navigate('/admin');
-    } else {
-      navigate('/dashboard');
+    setLoading(true);
+    setError(null);
+    try {
+      // Call real backend login API
+      // TODO: Replace 'any' with proper response type
+      const res: any = await apiClient.post(endpoints.auth.login, {
+        email,
+        password,
+        remember: rememberMe,
+      });
+      // If backend returns token and user info
+      if (res.token) {
+        apiAuth.setToken(res.token);
+        setUser(res.user || { email: res.user?.email || email, role: res.user?.role || "user", profilePic: res.user?.profilePic });
+        if (res.user?.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
+      } else {
+        setError("Login failed: Invalid response from server.");
+      }
+    } catch (err: any) {
+      setError(err?.message || "Login failed. Please check your credentials.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,6 +90,9 @@ const Login = () => {
           
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="text-red-500 text-sm text-center font-semibold">{error}</div>
+              )}
               {/* Email Field */}
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">Email Address</Label>
@@ -145,8 +159,9 @@ const Login = () => {
                 type="submit"
                 className="w-full h-12 text-lg font-semibold hero-glow group"
                 size="lg"
+                disabled={loading}
               >
-                Sign In
+                {loading ? "Signing In..." : "Sign In"}
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </form>

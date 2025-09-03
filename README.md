@@ -284,26 +284,21 @@ npm run test:e2e
 yarn test:e2e
 ```
 
-## 📊 Analytics & SEO
 
-### **Search Engine Optimization**
-- Meta tags optimization
-- Open Graph implementation
-- Twitter Cards support
-- Structured data (JSON-LD)
-- Sitemap generation
+## 🔗 Backend Integration
 
-### **Analytics Integration**
-- Google Analytics 4
-- Custom event tracking
-- User behavior analysis
-- Performance monitoring
+This frontend is configured to work with a Laravel backend. See [API_INTEGRATION.md](./API_INTEGRATION.md) for detailed setup instructions.
 
-## 🔄 Deployment
+### **Quick Start**
+
+1. **Start Backend**: Navigate to your Laravel backend and run `php artisan serve`
+2. **Start Frontend**: Run `npm run dev` in this directory
+3. **Or use the provided script**: Run `start-servers.bat` or `start-servers.ps1`
 
 ### **Environment Variables**
 ```env
-VITE_API_URL=https://api.hawisoftware.com
+VITE_API_URL=http://localhost:8000/api
+VITE_ENABLE_MOCK_API=false
 VITE_GA_TRACKING_ID=GA_MEASUREMENT_ID
 VITE_SENTRY_DSN=SENTRY_DSN
 ```

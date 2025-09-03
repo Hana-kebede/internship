@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# Route all API requests to simple-backend.php
+RewriteRule ^api/(.*)$ simple-backend.php [QSA,L]
+
+# Route all other requests to index.html for SPA
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [QSA,L]
+

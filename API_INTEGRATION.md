@@ -1,438 +1,288 @@
-# API Integration Documentation
+# API Integration Guide - Frontend to Laravel Backend
 
-This document explains the API integration setup for the Hawi Software frontend application.
+This guide explains how to connect your React frontend with the Laravel backend.
 
-## Overview
+## 🚀 Quick Setup
 
-The application now includes a comprehensive API layer that connects to the backend server. The integration uses:
+### 1. Backend Setup (Laravel)
 
-- **React Query** for data fetching, caching, and state management
-- **Custom API client** for HTTP requests with authentication
-- **TypeScript interfaces** for type safety
-- **Error handling** with toast notifications
-- **Authentication** with JWT tokens
+First, ensure your Laravel backend is running:
 
-## File Structure
+```bash
+# Navigate to backend directory
+cd "C:\Users\Hana\OneDrive\Desktop\demo\interns-backend-main"
 
+# Install dependencies
+composer install
+
+# Copy environment file
+cp .env.example .env
+
+# Generate application key
+php artisan key:generate
+
+# Configure database in .env file
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3307
+DB_DATABASE=hawi_website
+DB_USERNAME=root
+DB_PASSWORD=87654321
+
+# Run migrations
+php artisan migrate
+
+# Start the development server
+php artisan serve
 ```
-src/
-├── lib/
-│   ├── api.ts          # API client and configuration
-│   └── services.ts     # API service functions
-├── hooks/
-│   └── useApi.ts       # React Query hooks
-└── env.example         # Environment variables template
+
+The backend will be available at: `http://localhost:8000`
+
+### 2. Frontend Setup (React)
+
+Your frontend is already configured to connect to the Laravel backend:
+
+```bash
+# Install dependencies (if not already done)
+npm install
+
+# Start the development server
+npm run dev
 ```
 
-## Environment Configuration
+The frontend will be available at: `http://localhost:5173`
 
-Create a `.env` file in the root directory with the following variables:
+## 🔧 Configuration
+
+### Environment Variables
+
+The frontend uses the following environment variables (already configured in `.env`):
 
 ```env
-# API Configuration
-VITE_API_URL=http://localhost:3000/api
-
-# Authentication
-VITE_JWT_SECRET=your-jwt-secret-key
-
-# Analytics
-VITE_GA_TRACKING_ID=GA_MEASUREMENT_ID
-
-# Error Tracking
-VITE_SENTRY_DSN=SENTRY_DSN
-
-# File Upload
-VITE_MAX_FILE_SIZE=5242880
-VITE_ALLOWED_FILE_TYPES=image/jpeg,image/png,image/gif,application/pdf
-
-# Development
-VITE_DEV_MODE=true
+VITE_API_URL=http://localhost:8000/api
 VITE_ENABLE_MOCK_API=false
 ```
 
-## API Client (`src/lib/api.ts`)
+### API Base URL
 
-The API client provides:
+The API base URL is configured to point to your Laravel backend:
+- **Development**: `http://localhost:8000/api`
+- **Production**: Update `VITE_API_URL` in your production environment
 
-- **Base HTTP methods**: GET, POST, PUT, PATCH, DELETE
-- **Authentication**: Automatic JWT token handling
-- **Error handling**: Custom ApiError class
-- **File uploads**: Progress tracking support
-- **Request/response interceptors**: Automatic error handling
+## 📡 API Endpoints
 
-### Usage
+### Authentication Endpoints
 
-```typescript
-import { apiClient } from '@/lib/api';
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/login` | User login |
+| POST | `/api/register` | User registration |
+| POST | `/api/logout` | User logout |
+| POST | `/api/forgot-password` | Send password reset |
+| POST | `/api/reset-password` | Reset password |
 
-// GET request
-const data = await apiClient.get('/users');
+### User Endpoints
 
-// POST request
-const result = await apiClient.post('/users', { name: 'John' });
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/user` | Get user profile |
+| PUT | `/api/user` | Update user profile |
 
-// File upload with progress
-const uploadResult = await apiClient.upload('/upload', file, (progress) => {
-  console.log(`Upload progress: ${progress}%`);
-});
-```
+### Project Endpoints
 
-## API Services (`src/lib/services.ts`)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/userprojects` | List user projects |
+| GET | `/api/userprojects/{id}` | Get specific project |
+| POST | `/api/userprojects` | Create new project |
+| PUT | `/api/userprojects/{id}` | Update project |
+| DELETE | `/api/userprojects/{id}` | Delete project |
 
-Organized service functions for different features:
+### Service Request Endpoints
 
-### Authentication Services
-- `authService.login()` - User login
-- `authService.register()` - User registration
-- `authService.logout()` - User logout
-- `authService.forgotPassword()` - Password reset request
-- `authService.resetPassword()` - Password reset
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/user_service-requests` | List service requests |
+| GET | `/api/user_service-requests/{id}` | Get specific request |
+| POST | `/api/user_service-requests` | Create new request |
+| PUT | `/api/user_service-requests/{id}` | Update request |
+| DELETE | `/api/user_service-requests/{id}` | Delete request |
 
-### User Services
-- `userService.getProfile()` - Get user profile
-- `userService.updateProfile()` - Update user profile
-- `userService.changePassword()` - Change password
-- `userService.uploadAvatar()` - Upload profile picture
+### Message Endpoints
 
-### Project Services
-- `projectService.getProjects()` - Get user projects
-- `projectService.createProject()` - Create new project
-- `projectService.updateProject()` - Update project
-- `projectService.deleteProject()` - Delete project
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/usermessages` | List messages |
+| GET | `/api/usermessages/{id}` | Get specific message |
+| POST | `/api/usermessages` | Send new message |
 
-### Service Request Services
-- `serviceRequestService.getServiceRequests()` - Get service requests
-- `serviceRequestService.createServiceRequest()` - Create service request
-- `serviceRequestService.submitFeedback()` - Submit feedback
+### Blog Endpoints
 
-### Message Services
-- `messageService.getMessages()` - Get messages
-- `messageService.createMessage()` - Send message
-- `messageService.markAsRead()` - Mark message as read
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/blog` | List blog posts |
+| GET | `/api/blogs/{id}` | Get specific post |
+| POST | `/api/blogs` | Create new post |
+| PUT | `/api/blogs/{id}` | Update post |
+| DELETE | `/api/blogs/{id}` | Delete post |
+| POST | `/api/blogs/{id}/increment-likes` | Like a post |
+| POST | `/api/blogs/{id}/increment-views` | View a post |
 
-### Blog Services
-- `blogService.getBlogPosts()` - Get blog posts
-- `blogService.createBlogPost()` - Create blog post
-- `blogService.likeBlogPost()` - Like blog post
-- `blogService.viewBlogPost()` - Record blog view
+### Admin Endpoints
 
-### Admin Services
-- `adminService.getUsers()` - Get all users
-- `adminService.getAnalytics()` - Get analytics data
-- `adminService.getTeam()` - Get team members
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/overview` | Admin dashboard overview |
+| GET | `/api/users` | List all users |
+| GET | `/api/admin/projects` | List all projects |
+| GET | `/api/admin/services` | List all service requests |
+| GET | `/api/admin/messages` | List all messages |
+| GET | `/api/team-members` | List team members |
+| GET | `/api/blogs` | List all blog posts |
 
-## React Query Hooks (`src/hooks/useApi.ts`)
+## 🔐 Authentication
 
-Custom hooks that provide:
+The frontend uses Laravel Sanctum for authentication. Here's how it works:
 
-- **Data fetching** with caching
-- **Loading states** for UI feedback
-- **Error handling** with toast notifications
-- **Optimistic updates** for better UX
-- **Automatic refetching** on window focus
+### Login Process
 
-### Available Hooks
+1. User submits login form
+2. Frontend sends POST request to `/api/login`
+3. Backend validates credentials and returns token
+4. Frontend stores token in localStorage
+5. Token is automatically included in subsequent requests
 
-#### Authentication Hooks
-```typescript
-const loginMutation = useLogin();
-const registerMutation = useRegister();
-const logoutMutation = useLogout();
-const forgotPasswordMutation = useForgotPassword();
-const resetPasswordMutation = useResetPassword();
-```
-
-#### User Hooks
-```typescript
-const { data: profile, isLoading } = useProfile();
-const updateProfileMutation = useUpdateProfile();
-const changePasswordMutation = useChangePassword();
-const uploadAvatarMutation = useUploadAvatar();
-```
-
-#### Project Hooks
-```typescript
-const { data: projects, isLoading } = useProjects({ page: 1, limit: 10 });
-const { data: project } = useProject(projectId);
-const createProjectMutation = useCreateProject();
-const updateProjectMutation = useUpdateProject();
-const deleteProjectMutation = useDeleteProject();
-```
-
-#### Service Request Hooks
-```typescript
-const { data: serviceRequests } = useServiceRequests();
-const createServiceRequestMutation = useCreateServiceRequest();
-const submitFeedbackMutation = useSubmitFeedback();
-```
-
-#### Message Hooks
-```typescript
-const { data: messages } = useMessages();
-const createMessageMutation = useCreateMessage();
-const markAsReadMutation = useMarkMessageAsRead();
-```
-
-#### Blog Hooks
-```typescript
-const { data: blogPosts } = useBlogPosts({ featured: true });
-const likeBlogPostMutation = useLikeBlogPost();
-const viewBlogPostMutation = useViewBlogPost();
-```
-
-#### Admin Hooks
-```typescript
-const { data: users } = useAdminUsers();
-const { data: analytics } = useAdminAnalytics();
-const { data: team } = useAdminTeam();
-```
-
-## Usage Examples
-
-### Login Component
+### Token Management
 
 ```typescript
-import { useLogin } from '@/hooks/useApi';
+// Store token after login
+auth.setToken(response.data.token);
 
-const Login = () => {
-  const loginMutation = useLogin();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      const result = await loginMutation.mutateAsync({ 
-        email, 
-        password 
-      });
-      
-      if (result.success) {
-        // Navigate to dashboard
-        navigate('/dashboard');
-      }
-    } catch (error) {
-      // Error handling is automatic
-    }
-  };
-
-  return (
-    <Button 
-      type="submit" 
-      disabled={loginMutation.isPending}
-    >
-      {loginMutation.isPending ? 'Signing In...' : 'Sign In'}
-    </Button>
-  );
-};
-```
-
-### Data Fetching Component
-
-```typescript
-import { useProjects } from '@/hooks/useApi';
-
-const ProjectsList = () => {
-  const { data: projects, isLoading, error } = useProjects();
-
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading projects</div>;
-
-  return (
-    <div>
-      {projects?.data?.map(project => (
-        <ProjectCard key={project.id} project={project} />
-      ))}
-    </div>
-  );
-};
-```
-
-### Form Submission
-
-```typescript
-import { useCreateProject } from '@/hooks/useApi';
-
-const CreateProject = () => {
-  const createProjectMutation = useCreateProject();
-
-  const handleSubmit = async (formData) => {
-    try {
-      await createProjectMutation.mutateAsync(formData);
-      // Form will be reset and success toast shown automatically
-    } catch (error) {
-      // Error toast shown automatically
-    }
-  };
-};
-```
-
-## Error Handling
-
-The API integration includes comprehensive error handling:
-
-1. **Network errors** - Automatic retry with exponential backoff
-2. **Authentication errors** - Automatic logout and redirect to login
-3. **Validation errors** - Displayed as toast notifications
-4. **Server errors** - Graceful degradation with user-friendly messages
-
-## Authentication Flow
-
-1. **Login** - JWT token stored in localStorage
-2. **Automatic token inclusion** - All API requests include Authorization header
-3. **Token refresh** - Automatic token refresh when expired
-4. **Logout** - Token removed and cache cleared
-
-## Caching Strategy
-
-React Query provides intelligent caching:
-
-- **Automatic caching** - Data cached by query key
-- **Background updates** - Data refreshed in background
-- **Stale-while-revalidate** - Show cached data while fetching fresh data
-- **Cache invalidation** - Automatic cache updates after mutations
-
-## File Upload
-
-The API supports file uploads with progress tracking:
-
-```typescript
-const uploadMutation = useUploadImage();
-
-const handleFileUpload = async (file: File) => {
-  try {
-    const result = await uploadMutation.mutateAsync(file);
-    console.log('Upload successful:', result.data.url);
-  } catch (error) {
-    console.error('Upload failed:', error);
+// Include token in requests (automatic)
+const config = {
+  headers: {
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
   }
 };
 ```
 
-## Backend API Requirements
+### Protected Routes
 
-The backend should implement these endpoints:
+All protected endpoints require the `auth:sanctum` middleware on the backend and a valid token on the frontend.
 
-### Authentication
-- `POST /auth/login` - User login
-- `POST /auth/register` - User registration
-- `POST /auth/logout` - User logout
-- `POST /auth/refresh` - Refresh token
-- `POST /auth/forgot-password` - Request password reset
-- `POST /auth/reset-password` - Reset password
+## 📊 Data Flow
 
-### Users
-- `GET /users/profile` - Get user profile
-- `PUT /users/profile` - Update user profile
-- `POST /users/change-password` - Change password
-- `POST /users/avatar` - Upload avatar
+### Example: User Dashboard
 
-### Projects
-- `GET /projects` - Get projects (with pagination)
-- `POST /projects` - Create project
-- `GET /projects/:id` - Get project details
-- `PUT /projects/:id` - Update project
-- `DELETE /projects/:id` - Delete project
-- `PATCH /projects/:id/status` - Update project status
+1. **Frontend**: User navigates to dashboard
+2. **Frontend**: Makes authenticated request to `/api/userprojects`
+3. **Backend**: Validates token and returns user's projects
+4. **Frontend**: Displays projects in the UI
 
-### Service Requests
-- `GET /service-requests` - Get service requests
-- `POST /service-requests` - Create service request
-- `GET /service-requests/:id` - Get service request details
-- `PUT /service-requests/:id` - Update service request
-- `DELETE /service-requests/:id` - Delete service request
-- `POST /service-requests/:id/feedback` - Submit feedback
+### Example: Creating a Service Request
 
-### Messages
-- `GET /messages` - Get messages
-- `POST /messages` - Send message
-- `GET /messages/:id` - Get message details
-- `DELETE /messages/:id` - Delete message
-- `PATCH /messages/:id/read` - Mark as read
+1. **Frontend**: User fills out service request form
+2. **Frontend**: Sends POST request to `/api/user_service-requests`
+3. **Backend**: Validates data and creates request
+4. **Backend**: Returns success response with new request data
+5. **Frontend**: Updates UI to show new request
 
-### Blog
-- `GET /blog` - Get blog posts
-- `POST /blog` - Create blog post
-- `GET /blog/:id` - Get blog post details
-- `PUT /blog/:id` - Update blog post
-- `DELETE /blog/:id` - Delete blog post
-- `POST /blog/:id/like` - Like blog post
-- `POST /blog/:id/view` - Record view
+## 🛠️ Error Handling
 
-### Admin
-- `GET /admin/users` - Get all users
-- `GET /admin/analytics` - Get analytics
-- `GET /admin/team` - Get team members
-- `POST /admin/team` - Add team member
-- `PUT /admin/team/:id` - Update team member
-- `DELETE /admin/team/:id` - Delete team member
-
-### Contact
-- `POST /contact` - Submit contact form
-
-### File Upload
-- `POST /upload/image` - Upload image
-- `POST /upload/document` - Upload document
-
-## Response Format
-
-All API responses should follow this format:
+The frontend includes comprehensive error handling:
 
 ```typescript
-interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  error?: string;
-}
-
-interface PaginatedResponse<T> extends ApiResponse<T[]> {
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+try {
+  const response = await apiClient.post(endpoints.serviceRequests.create, data);
+  // Handle success
+} catch (error) {
+  if (error instanceof ApiError) {
+    // Handle API errors
+    console.error(`API Error ${error.status}: ${error.message}`);
+  } else {
+    // Handle network errors
+    console.error('Network error:', error);
+  }
 }
 ```
 
-## Testing
+## 🔄 CORS Configuration
 
-To test the API integration:
+The Laravel backend should be configured to allow requests from your frontend:
 
-1. **Start the backend server** on the configured port
-2. **Set environment variables** in `.env` file
-3. **Run the frontend** with `npm run dev`
-4. **Test authentication** by logging in
-5. **Test data fetching** by navigating to dashboard
-6. **Test form submissions** by creating projects/requests
+```php
+// config/cors.php
+return [
+    'paths' => ['api/*'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => ['http://localhost:5173'], // Frontend URL
+    'allowed_origins_patterns' => [],
+    'allowed_headers' => ['*'],
+    'exposed_headers' => [],
+    'max_age' => 0,
+    'supports_credentials' => true,
+];
+```
 
-## Troubleshooting
+## 🧪 Testing the Connection
 
-### Common Issues
+### 1. Test Backend Health
 
-1. **CORS errors** - Ensure backend allows frontend origin
-2. **Authentication errors** - Check JWT token format and expiration
-3. **Network errors** - Verify API URL and server status
-4. **Type errors** - Ensure TypeScript interfaces match backend schema
+```bash
+curl http://localhost:8000/api/home
+```
 
-### Debug Mode
+Expected response:
+```json
+{
+  "title": "Welcome to Hawi Software Solutions",
+  "message": "We build modern software solutions."
+}
+```
 
-Enable debug mode by setting `VITE_DEV_MODE=true` to see detailed API logs in the console.
+### 2. Test Frontend Connection
 
-## Security Considerations
+1. Start both servers
+2. Open browser to `http://localhost:5173`
+3. Try to login or register
+4. Check browser network tab for API calls
 
-1. **HTTPS** - Use HTTPS in production
-2. **Token storage** - JWT tokens stored in localStorage (consider httpOnly cookies for production)
-3. **Input validation** - Validate all user inputs
-4. **Rate limiting** - Implement rate limiting on backend
-5. **CORS** - Configure CORS properly on backend
+### 3. Common Issues
 
-## Performance Optimization
+**CORS Error**: Ensure Laravel CORS is configured correctly
+**401 Unauthorized**: Check if token is being sent correctly
+**404 Not Found**: Verify API endpoints match between frontend and backend
 
-1. **Query caching** - React Query provides automatic caching
-2. **Pagination** - Use pagination for large datasets
-3. **Lazy loading** - Load data only when needed
-4. **Optimistic updates** - Update UI immediately, sync with server
-5. **Background sync** - Refresh data in background
+## 📝 Development Workflow
 
-This API integration provides a robust foundation for the Hawi Software frontend application with proper error handling, caching, and user experience optimizations.
+1. **Backend Changes**: Update Laravel routes/controllers
+2. **Frontend Changes**: Update API endpoints in `src/lib/api.ts`
+3. **Testing**: Test both frontend and backend together
+4. **Deployment**: Update environment variables for production
+
+## 🚀 Production Deployment
+
+### Frontend Environment Variables
+
+```env
+VITE_API_URL=https://your-backend-domain.com/api
+VITE_ENABLE_MOCK_API=false
+```
+
+### Backend Environment Variables
+
+```env
+APP_URL=https://your-backend-domain.com
+CORS_ALLOWED_ORIGINS=https://your-frontend-domain.com
+```
+
+## 📚 Additional Resources
+
+- [Laravel Sanctum Documentation](https://laravel.com/docs/sanctum)
+- [React API Integration Best Practices](https://react.dev/learn/start-a-new-react-project)
+- [CORS Configuration](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)
+
+---
+
+**Note**: This integration assumes your Laravel backend is properly configured with Sanctum authentication and the necessary middleware. If you encounter issues, check the Laravel logs and ensure all dependencies are installed.

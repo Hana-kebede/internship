@@ -65,6 +65,52 @@ import { useContext } from "react";
 import { UserContext } from "@/App";
 
 const AdminDashboard = () => {
+  // State for real users and team members
+  const [users, setUsers] = useState<any[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
+  const [usersError, setUsersError] = useState("");
+  const [teamMembers, setTeamMembers] = useState<any[]>([]); // Initialize team members
+  const [teamLoading, setTeamLoading] = useState(true);
+  const [teamError, setTeamError] = useState("");
+
+  // Fetch users and team members from backend
+  useEffect(() => {
+    setUsersLoading(true);
+    setTeamLoading(true);
+    import("@/lib/services").then(({ adminService }) => {
+      adminService.getUsers({ page: 1, limit: 100 }).then(res => {
+        if (res.success) {
+          setUsers(res.data || []);
+          setUsersError("");
+        } else {
+          setUsersError(res.error || "Failed to load users");
+        }
+        setUsersLoading(false);
+      }).catch(() => {
+        setUsersError("Failed to load users");
+        setUsersLoading(false);
+      });
+      adminService.getTeam().then(res => {
+        if (res.success) {
+          setTeamMembers(res.data || []);
+          setTeamError("");
+        } else {
+          setTeamError(res.error || "Failed to load team members");
+        }
+        setTeamLoading(false);
+      }).catch(() => {
+        setTeamError("Failed to load team members");
+        setTeamLoading(false);
+      });
+    });
+  }, []);
+  // Handle profile picture upload for new user
+  const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      setNewUser(prev => ({ ...prev, profilePicture: file }));
+    }
+  };
   const [activeTab, setActiveTab] = useState("overview");
   const navigate = useNavigate();
 
@@ -202,13 +248,7 @@ const AdminDashboard = () => {
     "Custom Software Solution"
   ];
 
-  const teamMembers = [
-    { id: 1, name: "Michael Chen", role: "Senior Developer" },
-    { id: 2, name: "Lisa Park", role: "UI/UX Designer" },
-    { id: 3, name: "David Kim", role: "Project Manager" },
-    { id: 4, name: "Sarah Dev", role: "Frontend Developer" },
-    { id: 5, name: "Alex Johnson", role: "Backend Developer" }
-  ];
+  // Removed duplicate hardcoded teamMembers array
 
   const projectStatuses = ["Planning", "In Progress", "Review", "Testing", "Completed", "On Hold", "Cancelled"];
   
@@ -217,98 +257,6 @@ const AdminDashboard = () => {
   
   const teams = ["Development", "Design", "QA", "Project Management", "Marketing"];
   
-  const teamMembersData = [
-    {
-      id: 1,
-      name: "Michael Chen",
-      email: "michael@hawisoft.com",
-      role: "Senior Developer",
-      department: "Development",
-      status: "Active",
-      profilePic: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-      phone: "+251 912345678",
-      joinedDate: "2023-06-20",
-      completedTasks: 45,
-      currentProjects: 3,
-      performance: 95,
-      skills: ["React", "Node.js", "TypeScript", "MongoDB"]
-    },
-    {
-      id: 2,
-      name: "Lisa Park",
-      email: "lisa@hawisoft.com",
-      role: "UI/UX Designer",
-      department: "Design",
-      status: "Active",
-      profilePic: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-      phone: "+251 912345679",
-      joinedDate: "2023-08-15",
-      completedTasks: 38,
-      currentProjects: 2,
-      performance: 92,
-      skills: ["Figma", "Adobe XD", "Sketch", "Prototyping"]
-    },
-    {
-      id: 3,
-      name: "David Kim",
-      email: "david@hawisoft.com",
-      role: "Project Manager",
-      department: "Project Management",
-      status: "Active",
-      profilePic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-      phone: "+251 912345680",
-      joinedDate: "2023-05-10",
-      completedTasks: 52,
-      currentProjects: 4,
-      performance: 98,
-      skills: ["Agile", "Scrum", "Jira", "Leadership"]
-    },
-    {
-      id: 4,
-      name: "Sarah Dev",
-      email: "sarah@hawisoft.com",
-      role: "Frontend Developer",
-      department: "Development",
-      status: "Active",
-      profilePic: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-      phone: "+251 912345681",
-      joinedDate: "2023-09-01",
-      completedTasks: 28,
-      currentProjects: 2,
-      performance: 88,
-      skills: ["Vue.js", "CSS", "JavaScript", "Bootstrap"]
-    },
-    {
-      id: 5,
-      name: "Alex Johnson",
-      email: "alex@hawisoft.com",
-      role: "Backend Developer",
-      department: "Development",
-      status: "Inactive",
-      profilePic: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-      phone: "+251 912345682",
-      joinedDate: "2023-07-12",
-      completedTasks: 35,
-      currentProjects: 0,
-      performance: 85,
-      skills: ["Python", "Django", "PostgreSQL", "Docker"]
-    },
-    {
-      id: 6,
-      name: "Emma Wilson",
-      email: "emma@hawisoft.com",
-      role: "QA Engineer",
-      department: "QA",
-      status: "Active",
-      profilePic: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
-      phone: "+251 912345683",
-      joinedDate: "2023-10-05",
-      completedTasks: 42,
-      currentProjects: 3,
-      performance: 90,
-      skills: ["Selenium", "Jest", "Cypress", "Manual Testing"]
-    }
-  ];
 
   // Form validation state
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -365,27 +313,32 @@ const AdminDashboard = () => {
     setIsCreatingUser(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('New team member created:', newUser);
-      
-      // Reset form
-      setNewUser({
-        fullName: "",
-        email: "",
-        role: "",
-        department: "",
-        status: "Active",
-        phone: "",
-        profilePicture: null
+      // Use real API call
+      const { adminService } = await import("@/lib/services");
+      // Use a default password for now, or update UI to collect it
+      const response = await adminService.addTeamMember({
+        name: newUser.fullName,
+        email: newUser.email,
+        password: "changeme123", // Default password
+        company: newUser.department,
+        phone: newUser.phone
       });
-      setUserFormErrors({});
-      setAddUserOpen(false);
-      
-      // Show success message
-      alert("Team member created successfully!");
-      
+      if (response.success) {
+        setNewUser({
+          fullName: "",
+          email: "",
+          role: "",
+          department: "",
+          status: "Active",
+          phone: "",
+          profilePicture: null
+        });
+        setUserFormErrors({});
+        setAddUserOpen(false);
+        alert("Team member created successfully!");
+      } else {
+        alert(response.error || "Error creating team member. Please try again.");
+      }
     } catch (error) {
       console.error('Error creating team member:', error);
       alert("Error creating team member. Please try again.");
@@ -405,50 +358,43 @@ const AdminDashboard = () => {
     }
 
     setIsCreatingUser(true);
-    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log('New user created:', newUserForUsersTab);
-      
-      // Reset form
-      setNewUserForUsersTab({
-        fullName: "",
-        email: "",
-        password: "",
-        company: "",
-        role: "",
-        status: "Active",
-        joinedDate: "",
-        phone: "",
-        profilePicture: null
+      const { authService } = await import("@/lib/services");
+      const response = await authService.register({
+        name: newUserForUsersTab.fullName,
+        email: newUserForUsersTab.email,
+        password: newUserForUsersTab.password,
+        company: newUserForUsersTab.company,
+        phone: newUserForUsersTab.phone
       });
-      setAddUserForUsersTabOpen(false);
-      
-      // Show success message
-      alert("User created successfully!");
-      
-    } catch (error) {
-      console.error('Error creating user:', error);
+      if (response.success) {
+        setNewUserForUsersTab({
+          fullName: "",
+          email: "",
+          password: "",
+          company: "",
+          role: "",
+          status: "Active",
+          joinedDate: "",
+          phone: "",
+          profilePicture: null
+        });
+        setAddUserForUsersTabOpen(false);
+        alert("User created successfully!");
+      } else {
+        alert(response.error || "Error creating user. Please try again.");
+      }
+    } catch (err) {
+      console.error('Error creating user:', err);
       alert("Error creating user. Please try again.");
     } finally {
       setIsCreatingUser(false);
     }
   };
 
-  // Handle profile picture upload
-  const handleProfilePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setNewUser(prev => ({ ...prev, profilePicture: file }));
-    }
-  };
-
   // Team Member Functions
-  const filteredTeamMembers = teamMembersData.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(teamSearch.toLowerCase()) ||
-                         member.role.toLowerCase().includes(teamSearch.toLowerCase());
+  const filteredTeamMembers = teamMembers.filter(member => {
+  const matchesSearch = member.name.toLowerCase().includes(teamSearch.toLowerCase()) || member.role.toLowerCase().includes(teamSearch.toLowerCase());
     const matchesRole = !teamFilter.role || teamFilter.role === "all" || member.role === teamFilter.role;
     const matchesDepartment = !teamFilter.team || teamFilter.team === "all" || member.department === teamFilter.team;
     const matchesStatus = !teamFilter.status || teamFilter.status === "all" || member.status === teamFilter.status;
@@ -503,17 +449,17 @@ const AdminDashboard = () => {
     const csvContent = [
       ['Name', 'Email', 'Role', 'Team', 'Status', 'Phone', 'Joined Date', 'Completed Tasks', 'Performance'],
       ...filteredTeamMembers.map(member => [
-        member.name,
-        member.email,
-        member.role,
-        member.department,
-        member.status,
-        member.phone,
-        member.joinedDate,
-        member.completedTasks,
-        member.performance
-      ])
-    ].map(row => row.join(',')).join('\n');
+          member.name,
+          member.email,
+          member.role,
+          member.department,
+          member.status,
+          member.phone,
+          member.joinedDate,
+          member.completedTasks,
+          member.performance
+        ])
+      ].map(row => row.join(',')).join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -663,227 +609,187 @@ const AdminDashboard = () => {
     }));
   };
 
-  const users = [
-    {
-      id: 1,
-      name: "Hana Kebede",
-      email: "hani@example.com",
-      company: "Hawi Software Solutions",
-      role: "Client",
-      status: "Active",
-      joined: "2024-01-10"
-    },
-    {
-      id: 2,
-      name: "John Doe",
-      email: "john@example.com",
-      company: "Tech Innovations Inc.",
-      role: "Client",
-      status: "Active",
-      joined: "2023-12-15"
-    },
-    {
-      id: 3,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      company: "Digital Solutions",
-      role: "Client",
-      status: "Active",
-      joined: "2024-01-08"
-    },
-    {
-      id: 4,
-      name: "Admin User",
-      email: "admin@hawisoft.com",
-      company: "Hawi Software",
-      role: "Admin",
-      status: "Active",
-      joined: "2023-06-20"
-    }
-  ];
+  // Removed duplicate hardcoded users array
 
-  const projects = [
-    {
-      id: 1,
-      name: "E-commerce Platform",
-      client: "John Doe",
-      status: "In Progress",
-      progress: 75,
-      deadline: "2024-02-15",
-      budget: "$15,000",
-      team: ["Michael Chen", "Sarah Dev"]
-    },
-    {
-      id: 2,
-      name: "Mobile App",
-      client: "Sarah Johnson",
-      status: "Review",
-      progress: 90,
-      deadline: "2024-01-30",
-      budget: "$8,000",
-      team: ["Lisa Park", "David Kim"]
-    },
-    {
-      id: 3,
-      name: "Website Redesign",
-      client: "Tech Corp",
-      status: "Planning",
-      progress: 25,
-      deadline: "2024-03-20",
-      budget: "$5,000",
-      team: ["Michael Chen"]
-    }
-  ];
+  // Projects state and fetch from backend
+  const [projects, setProjects] = useState<any[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsError, setProjectsError] = useState("");
 
-  const serviceRequests = [
-    {
-      id: 1,
-      title: "SEO Optimization Request",
-      description: "Need SEO optimization for our e-commerce website to improve search rankings",
-      client: "John Doe",
-      status: "Open",
-      priority: "High",
-      category: "Web Development",
-      projectRelated: "E-commerce Website",
-      urgency: "High",
-      expectedResolution: "24-48 hours",
-      additionalNotes: "Focus on product pages and category optimization",
-      submittedDate: "2024-01-20",
-      assignedTo: "Michael Chen",
-      feedback: {
-        rating: 4,
-        comment: "Great communication and quick response time",
-        satisfaction: "Very Satisfied",
-        improvement: "Could provide more detailed progress updates"
-      }
-    },
-    {
-      id: 2,
-      title: "Additional Features",
-      description: "Add payment gateway integration and push notifications to mobile app",
-      client: "Sarah Johnson",
-      status: "In Progress",
-      priority: "Medium",
-      category: "Mobile App Development",
-      projectRelated: "Restaurant Mobile App",
-      urgency: "Medium",
-      expectedResolution: "1 week",
-      additionalNotes: "Need to support multiple payment methods",
-      submittedDate: "2024-01-18",
-      assignedTo: "Lisa Park",
-      feedback: {
-        rating: 5,
-        comment: "Excellent work quality and professional service",
-        satisfaction: "Extremely Satisfied",
-        improvement: "No improvements needed"
-      }
-    },
-    {
-      id: 3,
-      title: "Bug Fix Request",
-      description: "Fix login authentication issue in the admin panel",
-      client: "Tech Corp",
-      status: "Resolved",
-      priority: "Low",
-      category: "Software Development",
-      projectRelated: "Inventory Management System",
-      urgency: "Low",
-      expectedResolution: "3-5 days",
-      additionalNotes: "Issue occurs only with specific user roles",
-      submittedDate: "2024-01-15",
-      assignedTo: "David Kim",
-      feedback: {
-        rating: 3,
-        comment: "Issue resolved but took longer than expected",
-        satisfaction: "Satisfied",
-        improvement: "Faster response time would be appreciated"
-      }
-    }
-  ];
+  useEffect(() => {
+    setProjectsLoading(true);
+    import("@/lib/services").then(({ projectService }) => {
+      projectService.getProjects({ page: 1, limit: 100 }).then(res => {
+        if (res.success) {
+          setProjects(res.data || []);
+          setProjectsError("");
+        } else {
+          setProjectsError(res.error || "Failed to load projects");
+        }
+        setProjectsLoading(false);
+      }).catch(() => {
+        setProjectsError("Failed to load projects");
+        setProjectsLoading(false);
+      });
+    });
+  }, []);
 
-  const blogPosts = [
+  // Service Requests state and fetch from backend
+  const [serviceRequests, setServiceRequests] = useState<any[]>([]);
+  const [serviceRequestsLoading, setServiceRequestsLoading] = useState(true);
+  const [serviceRequestsError, setServiceRequestsError] = useState("");
+
+  useEffect(() => {
+    setServiceRequestsLoading(true);
+    import("@/lib/services").then(({ serviceRequestService }) => {
+      serviceRequestService.getServiceRequests({ page: 1, limit: 100 }).then(res => {
+        if (res.success) {
+          setServiceRequests(res.data || []);
+          setServiceRequestsError("");
+        } else {
+          setServiceRequestsError(res.error || "Failed to load service requests");
+        }
+        setServiceRequestsLoading(false);
+      }).catch(() => {
+        setServiceRequestsError("Failed to load service requests");
+        setServiceRequestsLoading(false);
+      });
+    });
+  }, []);
     {
-      id: 1,
-      title: "The Future of Web Development",
-      author: "Admin",
-      status: "Published",
-      date: "2024-01-15",
-      views: 1250,
-      likes: 89,
-      category: "Web Development"
-    },
-    {
-      id: 2,
-      title: "Mobile App Best Practices",
-      author: "Sarah Johnson",
-      status: "Draft",
-      date: "2024-01-12",
-      views: 0,
-      likes: 0,
-      category: "Mobile Development"
-    },
-    {
-      id: 3,
-      title: "Building Scalable Architecture",
-      author: "Michael Chen",
-      status: "Review",
-      date: "2024-01-10",
-      views: 890,
-      likes: 45,
-      category: "Software Architecture"
+  // Removed leftover hardcoded serviceRequests array
+
+  // Blog Posts state and fetch from backend
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [blogPostsLoading, setBlogPostsLoading] = useState(true);
+  const [blogPostsError, setBlogPostsError] = useState("");
+
+  useEffect(() => {
+    setBlogPostsLoading(true);
+    import("@/lib/services").then(({ blogService }) => {
+      blogService.getBlogPosts({ page: 1, limit: 100 }).then(res => {
+        if (res.success) {
+          setBlogPosts(res.data || []);
+          setBlogPostsError("");
+        } else {
+          setBlogPostsError(res.error || "Failed to load blog posts");
+        }
+        setBlogPostsLoading(false);
+      }).catch(() => {
+        setBlogPostsError("Failed to load blog posts");
+        setBlogPostsLoading(false);
+      });
+    });
+  }, []);
+
+  // Blog post creation handler (for new post form)
+  const handleCreateBlogPost = async (data: any) => {
+    setBlogPostsLoading(true);
+    let imageUrl = data.image_url || "";
+    // If image is a File, upload it first (simulate upload, or use your backend endpoint if available)
+    if (data.coverImage && typeof File !== 'undefined' && data.coverImage instanceof File) {
+      // TODO: Replace this with your real image upload endpoint if available
+      // For now, skip upload and set imageUrl to empty or a placeholder
+      // imageUrl = await uploadImageAndGetUrl(data.coverImage);
+      imageUrl = ""; // Set to empty or a placeholder
     }
-  ];
+    const payload = {
+      title: data.title,
+      author: data.author || "Admin",
+      category: data.category,
+      status: data.status || "Draft",
+      image_url: imageUrl,
+      content: data.content,
+      publish_date: data.publish_date || null,
+      excerpt: data.excerpt || (data.content ? data.content.substring(0, 120) + (data.content.length > 120 ? '...' : '') : ''),
+      tags: data.tags || [],
+      featured: data.featured || false,
+      published: data.published || false,
+    };
+    const { blogService } = await import("@/lib/services");
+    const res = await blogService.createBlogPost(payload);
+    if (res.success) {
+      setBlogPosts([res.data, ...blogPosts]);
+      setBlogPostsError("");
+    } else {
+      setBlogPostsError(res.error || "Failed to create blog post");
+    }
+    setBlogPostsLoading(false);
+  };
+
+  // Messages state and fetch from backend
+  const [messages, setMessages] = useState<any[]>([]);
+  const [messagesLoading, setMessagesLoading] = useState(true);
+  const [messagesError, setMessagesError] = useState("");
+
+  useEffect(() => {
+    setMessagesLoading(true);
+    import("@/lib/services").then(({ messageService }) => {
+      messageService.getMessages({ page: 1, limit: 100 }).then(res => {
+        if (res.success) {
+          setMessages(res.data || []);
+          setMessagesError("");
+        } else {
+          setMessagesError(res.error || "Failed to load messages");
+        }
+        setMessagesLoading(false);
+      }).catch(() => {
+        setMessagesError("Failed to load messages");
+        setMessagesLoading(false);
+      });
+    });
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+  <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
 
 
-      {/* Header */}
-      <header className="bg-background/95 backdrop-blur-sm border-b sticky top-0 z-40">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link to="/" className="flex items-center space-x-2">
-                <img src="https://www.hawisoftware.com/wp-content/uploads/2021/08/logohawi.png" alt="Hawi Software Logo" className="w-8 h-8 object-contain" />
-                <span className="font-bold text-lg">Hawi Software</span>
-              </Link>
-              <Badge variant="secondary">Admin Dashboard</Badge>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="icon" className="relative" onClick={() => setNotificationOpen(true)}>
-                <Bell className="h-5 w-5" />
-                <Badge className="absolute -top-1 -right-1 w-4 h-4 rounded-full p-0 flex items-center justify-center text-xs">
-                  {notifications.length}
-                </Badge>
-              </Button>
-              <Avatar onClick={() => setAdminProfileOpen(true)} className="cursor-pointer">
-                <AvatarImage src={user?.profilePic || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"} />
-                <AvatarFallback>AD</AvatarFallback>
-              </Avatar>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      You will be redirected to the home page and will need to login again to access the admin dashboard.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </div>
+    {/* Header */}
+    <header className="bg-background/95 backdrop-blur-sm border-b sticky top-0 z-40">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="flex items-center space-x-2">
+              <img src="https://www.hawisoftware.com/wp-content/uploads/2021/08/logohawi.png" alt="Hawi Software Logo" className="w-8 h-8 object-contain" />
+              <span className="font-bold text-lg">Hawi Software</span>
+            </Link>
+            <Badge variant="secondary">Admin Dashboard</Badge>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon" className="relative" onClick={() => setNotificationOpen(true)}>
+              <Bell className="h-5 w-5" />
+              <Badge className="absolute -top-1 -right-1 w-4 h-4 rounded-full p-0 flex items-center justify-center text-xs">
+                {notifications.length}
+              </Badge>
+            </Button>
+            <Avatar onClick={() => setAdminProfileOpen(true)} className="cursor-pointer">
+              <AvatarImage src={user?.profilePic || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face"} />
+              <AvatarFallback>AD</AvatarFallback>
+            </Avatar>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure you want to logout?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    You will be redirected to the home page and will need to login again to access the admin dashboard.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleLogout}>Logout</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
-      </header>
+      </div>
+    </header>
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 animate-fade-in">
@@ -911,8 +817,8 @@ const AdminDashboard = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                      <p className="text-3xl font-bold">128</p>
-                      <p className="text-sm text-green-600">+12% from last month</p>
+                      <p className="text-3xl font-bold">{Array.isArray(users) ? users.length : 0}</p>
+                      <p className="text-sm text-primary">Active</p>
                     </div>
                     <Users className="h-8 w-8 text-primary" />
                   </div>
@@ -956,21 +862,29 @@ const AdminDashboard = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {projects.slice(0, 3).map((project) => (
-                    <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                      <div className="flex-1">
-                        <h4 className="font-medium">{project.name}</h4>
-                        <p className="text-sm text-muted-foreground">Client: {project.client}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant={project.status === "In Progress" ? "default" : project.status === "Review" ? "secondary" : "outline"}>
-                            {project.status}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">{project.progress}%</span>
+                  {projectsLoading ? (
+                    <div>Loading projects...</div>
+                  ) : projectsError ? (
+                    <div className="text-red-500">{projectsError}</div>
+                  ) : projects && projects.length > 0 ? (
+                    projects.slice(0, 3).map((project) => (
+                      <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{project.title || project.name}</h4>
+                          <p className="text-sm text-muted-foreground">Client: {project.clientName || project.client}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant={project.status === "in-progress" || project.status === "In Progress" ? "default" : project.status === "review" || project.status === "Review" ? "secondary" : "outline"}>
+                              {project.status}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">{project.progress}%</span>
+                          </div>
+                          <Progress value={project.progress} className="mt-2" />
                         </div>
-                        <Progress value={project.progress} className="mt-2" />
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div>No projects found.</div>
+                  )}
                 </CardContent>
               </Card>
 
@@ -1019,80 +933,80 @@ const AdminDashboard = () => {
 
             <Card className="glass-card">
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Joined</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {users.filter(u => u.name.toLowerCase().includes(userSearch.toLowerCase()) || u.email.toLowerCase().includes(userSearch.toLowerCase())).map((user) => (
-                      <TableRow key={user.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar>
-                              <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium">{user.name}</p>
-                              <p className="text-sm text-muted-foreground">{user.email}</p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>{user.company}</TableCell>
-                        <TableCell>
-                          <Badge variant={user.role === "Client" ? "secondary" : "default"}>
-                            {user.role}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant={user.status === "Active" ? "default" : "secondary"}>
-                            {user.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{user.joined}</TableCell>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <Button variant="ghost" size="icon" onClick={() => setUserAction({ open: true, type: 'view', user })}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => setUserAction({ open: true, type: 'edit', user })}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => setUserAction({ open: false, type: '', user: null })}>
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Are you sure you want to delete <b>{user.name}</b>?</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    This action cannot be undone.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => {
-                                    // Simulate deletion
-                                    console.log("Simulating deletion for user:", user);
-                                    setUserAction({ ...userAction, open: false });
-                                  }}>Delete</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>User</TableHead>
+                        <TableHead>Company</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Joined</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                    {(Array.isArray(users) ? users : []).filter(u => u.name && u.email && (u.name.toLowerCase().includes(userSearch.toLowerCase()) || u.email.toLowerCase().includes(userSearch.toLowerCase()))).map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar>
+                              <AvatarFallback>{user.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>{user.company}</TableCell>
+                          <TableCell>
+                            <Badge variant={user.role === "Client" ? "secondary" : "default"}>
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={user.status === "Active" ? "default" : "secondary"}>
+                              {user.status}
+                            </Badge>
+                          </TableCell>
+                        <TableCell>{user.joined}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Button variant="ghost" size="icon" onClick={() => setUserAction({ open: true, type: 'view', user })}>
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="icon" onClick={() => setUserAction({ open: true, type: 'edit', user })}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="ghost" size="icon" onClick={() => setUserAction({ open: false, type: '', user: null })}>
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you sure you want to delete <b>{user.name}</b>?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => {
+                                      // Simulate deletion
+                                      console.log("Simulating deletion for user:", user);
+                                      setUserAction({ ...userAction, open: false });
+                                    }}>Delete</AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
               </CardContent>
             </Card>
           </TabsContent>
@@ -1117,7 +1031,7 @@ const AdminDashboard = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Total Team Members</p>
-                      <p className="text-3xl font-bold">{teamMembersData.length}</p>
+                      <p className="text-3xl font-bold">{teamMembers.length}</p>
                     </div>
                     <Users className="h-8 w-8 text-blue-500" />
                   </div>
@@ -1128,7 +1042,7 @@ const AdminDashboard = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium text-muted-foreground">Active Members</p>
-                      <p className="text-3xl font-bold">{teamMembersData.filter(m => m.status === "Active").length}</p>
+                      <p className="text-3xl font-bold">{teamMembers.filter(m => m.status === "Active").length}</p>
                     </div>
                     <CheckCircle className="h-8 w-8 text-green-500" />
                   </div>
@@ -1154,8 +1068,8 @@ const AdminDashboard = () => {
                   </SelectTrigger>
                   <SelectContent className="z-[100]">
                     <SelectItem value="all">All Roles</SelectItem>
-                    {Array.from(new Set(teamMembersData.map(m => m.role))).map(role => (
-                      <SelectItem key={role} value={role}>{role}</SelectItem>
+                    {Array.from(new Set(teamMembers.map(m => m.role))).map(role => (
+                      <SelectItem key={String(role)} value={String(role)}>{String(role)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -1165,58 +1079,19 @@ const AdminDashboard = () => {
                   </SelectTrigger>
                   <SelectContent className="z-[100]">
                     <SelectItem value="all">All Departments</SelectItem>
-                    {teams.map(team => (
-                      <SelectItem key={team} value={team}>{team}</SelectItem>
-                    ))}
+                    {projectsLoading ? (
+                      <SelectItem disabled value="loading">Loading...</SelectItem>
+                    ) : projectsError ? (
+                      <SelectItem disabled value="error">{projectsError}</SelectItem>
+                    ) : projects && projects.length > 0 ? (
+                      Array.from(new Set(projects.map((project) => project.department || project.team || ""))).filter(Boolean).map((dept) => (
+                        <SelectItem key={String(dept)} value={String(dept)}>{String(dept)}</SelectItem>
+                      ))
+                    ) : null}
                   </SelectContent>
                 </Select>
-                <Select value={teamFilter.status} onValueChange={(value) => setTeamFilter(prev => ({ ...prev, status: value }))}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue placeholder="Filter by Status" />
-                  </SelectTrigger>
-                  <SelectContent className="z-[100]">
-                    <SelectItem value="all">All Status</SelectItem>
-                    <SelectItem value="Active">Active</SelectItem>
-                    <SelectItem value="Inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Bulk Actions */}
-            {selectedTeamMembers.length > 0 && (
-              <div className="flex items-center justify-between p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-                <span className="text-sm font-medium">
-                  {selectedTeamMembers.length} team member(s) selected
-                </span>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => setBulkActionOpen(true)}>
-                    <Edit className="h-4 w-4 mr-2" />
-                    Bulk Edit
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" size="sm">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Bulk Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Selected Team Members?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will permanently delete {selectedTeamMembers.length} team member(s). This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleBulkDelete}>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
                 </div>
               </div>
-            )}
 
             {/* Team Member Table */}
             <Card className="glass-card">
@@ -1861,10 +1736,10 @@ const AdminDashboard = () => {
                                 </div>
                                 <Badge variant={request.feedback.rating >= 4 ? "default" : request.feedback.rating >= 3 ? "secondary" : "destructive"} className="text-xs">
                                   {request.feedback.satisfaction}
-                                </Badge>
+                                    </Badge>
                                 <div className="text-xs text-muted-foreground max-w-[150px] truncate" title={request.feedback.comment}>
                                   "{request.feedback.comment}"
-                                </div>
+                                    </div>
                               </div>
                             </TableCell>
                                                       <TableCell>
@@ -1951,30 +1826,30 @@ const AdminDashboard = () => {
           <TooltipProvider>
             <form className="space-y-6" onSubmit={handleCreateUser}>
               {/* Team Information Section */}
-             <div className="space-y-4">
+                <div className="space-y-4">
                <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">Team Information</h3>
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                 <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-foreground">Full Name</label>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Enter the user's full name (minimum 2 characters)</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                   <Input 
-                     placeholder="Enter full name" 
-                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <label className="text-sm font-medium text-foreground">Full Name</label>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Enter the user's full name (minimum 2 characters)</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                      <Input 
+                        placeholder="Enter full name" 
+                        className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
                       value={newUser.fullName}
                       onChange={e => setNewUser(prev => ({ ...prev, fullName: e.target.value }))}
-                     required 
-                   />
+                        required 
+                      />
                     {userFormErrors.fullName && <p className="text-xs text-red-500">{userFormErrors.fullName}</p>}
-                 </div>
+                    </div>
                   
                  <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -1987,7 +1862,7 @@ const AdminDashboard = () => {
                           <p>Enter a valid email address for the user</p>
                         </TooltipContent>
                       </Tooltip>
-                    </div>
+                  </div>
                    <Input 
                      placeholder="user@example.com" 
                      type="email" 
@@ -1997,7 +1872,7 @@ const AdminDashboard = () => {
                      required 
                    />
                     {userFormErrors.email && <p className="text-xs text-red-500">{userFormErrors.email}</p>}
-                 </div>
+                </div>
                   
 
                   
@@ -2157,11 +2032,11 @@ const AdminDashboard = () => {
                     </>
                   )}
                </Button>
-             </DialogFooter>
-           </form>
-          </TooltipProvider>
-        </DialogContent>
-      </Dialog>
+            </DialogFooter>
+          </form>
+        </TooltipProvider>
+      </DialogContent>
+    </Dialog>
 
       {/* Add User Modal for Users Tab */}
       <Dialog open={addUserForUsersTabOpen} onOpenChange={setAddUserForUsersTabOpen}>
@@ -2354,7 +2229,7 @@ const AdminDashboard = () => {
                     </div>
                     <Input 
                       placeholder="+251 912345678" 
-                      className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                     className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
                       value={newUserForUsersTab.phone}
                       onChange={e => setNewUserForUsersTab(prev => ({ ...prev, phone: e.target.value }))}
                     />
@@ -2397,7 +2272,7 @@ const AdminDashboard = () => {
                           <FileText className="h-3 w-3" />
                           {newUserForUsersTab.profilePicture.name}
                         </Badge>
-                      </div>
+                    </div>
                     )}
                   </div>
                 </div>
@@ -2407,7 +2282,7 @@ const AdminDashboard = () => {
                 <Button variant="outline" onClick={() => setAddUserForUsersTabOpen(false)} className="px-6">
                   Cancel
                 </Button>
-                <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white" disabled={isCreatingUser}>
+                  <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white" disabled={isCreatingUser}>
                   {isCreatingUser ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -2421,10 +2296,10 @@ const AdminDashboard = () => {
                   )}
                 </Button>
               </DialogFooter>
-            </form>
-          </TooltipProvider>
-        </DialogContent>
-      </Dialog>
+          </form>
+        </TooltipProvider>
+      </DialogContent>
+    </Dialog>
 
       {/* User Action Modal */}
       <Dialog open={userAction.open} onOpenChange={o => setUserAction({ ...userAction, open: o })}>
@@ -2450,8 +2325,8 @@ const AdminDashboard = () => {
               <Input defaultValue={userAction.user.role} />
               <DialogFooter>
                 <Button type="submit">Save</Button>
-              </DialogFooter>
-            </form>
+                </DialogFooter>
+              </form>
           )}
         </DialogContent>
       </Dialog>
@@ -2977,7 +2852,7 @@ const AdminDashboard = () => {
               {/* Additional Information */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-purple-600 border-b border-purple-200 pb-2">Additional Information</h3>
-                <div>
+              <div>
                   <Label htmlFor="additionalNotes">Additional Notes</Label>
                   <Textarea
                     id="additionalNotes"
@@ -3123,84 +2998,137 @@ const AdminDashboard = () => {
               Add New Blog Post
             </DialogTitle>
           </DialogHeader>
-          <form className="space-y-6" onSubmit={e => {
-            e.preventDefault();
-            console.log('New blog post added');
-            setAddPostOpen(false);
-          }}>
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">Blog Post Details</h3>
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Post Title</label>
-                  <Input 
-                    placeholder="Enter post title" 
-                    className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                    required 
-                  />
+          {/* Blog Post Form State */}
+          {(() => {
+            const [title, setTitle] = useState("");
+            const [author, setAuthor] = useState("");
+            const [date, setDate] = useState("");
+            const [status, setStatus] = useState("");
+            const [category, setCategory] = useState("");
+            const [image, setImage] = useState("");
+            const [content, setContent] = useState("");
+            const [submitting, setSubmitting] = useState(false);
+            const handleSubmit = async (e: React.FormEvent) => {
+              e.preventDefault();
+              setSubmitting(true);
+              // Auto-generate excerpt and tags
+              const excerpt = content ? content.substring(0, 120) + (content.length > 120 ? '...' : '') : '';
+              const tags = [];
+              const featured = false;
+              const payload: any = {
+                title,
+                content,
+                category,
+                author,
+                status,
+                publish_date: date || null,
+                image_url: "", // will be set in handleCreateBlogPost if image is uploaded
+                coverImage: (typeof File !== 'undefined' && image != null && ((image as any) instanceof File)) ? image : undefined,
+                excerpt: content ? content.substring(0, 120) + (content.length > 120 ? '...' : '') : '',
+                tags: [],
+                featured: false,
+                published: status === "published",
+              };
+              await handleCreateBlogPost(payload);
+              setTitle("");
+              setAuthor("");
+              setDate("");
+              setStatus("");
+              setCategory("");
+              setImage("");
+              setContent("");
+              setSubmitting(false);
+              setAddPostOpen(false);
+            };
+            return (
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-blue-600 border-b border-blue-500/20 pb-2">Blog Post Details</h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Post Title</label>
+                      <Input 
+                        placeholder="Enter post title" 
+                        className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        required 
+                        value={title}
+                        onChange={e => setTitle(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Author</label>
+                      <Input 
+                        placeholder="Enter author name" 
+                        className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        value={author}
+                        onChange={e => setAuthor(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Date</label>
+                      <Input 
+                        type="date"
+                        className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        value={date}
+                        onChange={e => setDate(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Status</label>
+                      <Select value={status} onValueChange={setStatus}>
+                        <SelectTrigger className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200">
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Draft</SelectItem>
+                          <SelectItem value="published">Published</SelectItem>
+                          <SelectItem value="review">Under Review</SelectItem>
+                          <SelectItem value="archived">Archived</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2 lg:col-span-2">
+                      <label className="text-sm font-medium text-foreground">Category</label>
+                      <Input 
+                        placeholder="e.g., Web Development, Mobile Apps, Software Architecture" 
+                        className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        value={category}
+                        onChange={e => setCategory(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2 lg:col-span-2">
+                      <label className="text-sm font-medium text-foreground">Image URL</label>
+                      <Input 
+                        placeholder="https://example.com/image.jpg" 
+                        className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
+                        type="url"
+                        value={image}
+                        onChange={e => setImage(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2 lg:col-span-2">
+                      <label className="text-sm font-medium text-foreground">Content</label>
+                      <Textarea 
+                        placeholder="Write your blog post content here... You can include markdown formatting, links, and rich text content." 
+                        className="min-h-48 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Author</label>
-                  <Input 
-                    placeholder="Enter author name" 
-                    className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Date</label>
-                  <Input 
-                    type="date"
-                    className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Status</label>
-                  <Select>
-                    <SelectTrigger className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200">
-                      <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="review">Under Review</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="text-sm font-medium text-foreground">Category</label>
-                  <Input 
-                    placeholder="e.g., Web Development, Mobile Apps, Software Architecture" 
-                    className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                  />
-                </div>
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="text-sm font-medium text-foreground">Image URL</label>
-                  <Input 
-                    placeholder="https://example.com/image.jpg" 
-                    className="h-11 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
-                    type="url"
-                  />
-                </div>
-                <div className="space-y-2 lg:col-span-2">
-                  <label className="text-sm font-medium text-foreground">Content</label>
-                  <Textarea 
-                    placeholder="Write your blog post content here... You can include markdown formatting, links, and rich text content." 
-                    className="min-h-48 border-blue-500/20 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 resize-none"
-                  />
-                </div>
-              </div>
-            </div>
 
-            <DialogFooter className="pt-4 border-t border-border">
-              <Button variant="outline" onClick={() => setAddPostOpen(false)} className="px-6">
-                Cancel
-              </Button>
-              <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white">
-                Add Post
-              </Button>
-            </DialogFooter>
-          </form>
+                <DialogFooter className="pt-4 border-t border-border">
+                  <Button variant="outline" onClick={() => setAddPostOpen(false)} className="px-6" type="button">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="px-6 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white" disabled={submitting}>
+                    {submitting ? "Adding..." : "Add Post"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
@@ -3472,8 +3400,8 @@ const AdminDashboard = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {Array.from(new Set(teamMembersData.map(m => m.role))).map(role => (
-                          <SelectItem key={role} value={role}>{role}</SelectItem>
+                        {Array.from(new Set(teamMembers.map(m => m.role))).map(role => (
+                          <SelectItem key={String(role)} value={String(role)}>{String(role)}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -3545,8 +3473,8 @@ const AdminDashboard = () => {
                   <SelectValue placeholder="Select new role" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Array.from(new Set(teamMembersData.map(m => m.role))).map(role => (
-                    <SelectItem key={role} value={role}>{role}</SelectItem>
+                  {Array.from(new Set(teamMembers.map(m => m.role))).map(role => (
+                    <SelectItem key={String(role)} value={String(role)}>{String(role)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -3641,7 +3569,7 @@ const AdminDashboard = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {projects.map(project => (
-                        <SelectItem key={project.id} value={project.name}>{project.name}</SelectItem>
+                        <SelectItem key={String(project.id)} value={String(project.id)}>{project.title || project.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -3669,9 +3597,9 @@ const AdminDashboard = () => {
                 <div>
                   <Label htmlFor="currentStatus">Current Status</Label>
                   <Select value={progressData.currentStatus} onValueChange={(value) => setProgressData(prev => ({ ...prev, currentStatus: value }))}>
-                    <SelectTrigger className="h-11 border-green-500/20 focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all duration-200">
+                  <SelectTrigger className="h-11 border-green-500/20 focus:border-green-500/50 focus:ring-2 focus:ring-green-500/20 transition-all duration-200">
                       <SelectValue placeholder="Select status" />
-                    </SelectTrigger>
+                  </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Planning">Planning</SelectItem>
                       <SelectItem value="In Progress">In Progress</SelectItem>
@@ -3819,11 +3747,11 @@ const AdminDashboard = () => {
                     <SelectContent>
                       {projectTypes.map(type => (
                         <SelectItem key={type} value={type}>{type}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
+            </div>
               <div>
                 <Label htmlFor="description">Project Description</Label>
                 <Textarea
@@ -4129,17 +4057,17 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {requestAction.type === 'delete' && requestAction.request && (
+        {requestAction.type === 'delete' && requestAction.request && (
             <div className="space-y-4">
               <p>Are you sure you want to delete the service request "{requestAction.request.title}"?</p>
               <p className="text-sm text-muted-foreground">This action cannot be undone.</p>
             </div>
           )}
 
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setRequestAction({ open: false, type: '', request: null })}>
-              Cancel
-            </Button>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setRequestAction({ open: false, type: '', request: null })}>
+                Cancel
+              </Button>
             {requestAction.type === 'edit' && (
               <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" onClick={() => {
                 console.log('Save service request changes');
@@ -4157,8 +4085,8 @@ const AdminDashboard = () => {
               </Button>
             )}
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      </DialogContent>
+    </Dialog>
 
       {/* Message Action Dialog */}
       <Dialog open={messageAction.open} onOpenChange={(open) => setMessageAction({ ...messageAction, open })}>
@@ -4270,5 +4198,5 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
+}
 export default AdminDashboard;

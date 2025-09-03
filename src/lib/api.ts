@@ -1,6 +1,7 @@
 // API Configuration and utilities
-const USE_REAL_API = false; // Set to false to use mock functionality
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { config } from './config';
+
+const API_BASE_URL = config.api.baseURL;
 
 // API Response types
 export interface ApiResponse<T = any> {
@@ -43,11 +44,6 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
-    // If not using real API, throw an error to prevent actual network calls
-    if (!USE_REAL_API) {
-      throw new ApiError(0, 'API calls disabled - using mock functionality');
-    }
-    
     const url = `${this.baseURL}${endpoint}`;
     
     // Get auth token from localStorage
@@ -56,6 +52,7 @@ class ApiClient {
     const config: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
@@ -186,82 +183,82 @@ export const auth = {
   }
 };
 
-// API endpoints
+// API endpoints - Updated to match Laravel backend routes
 export const endpoints = {
   // Auth
   auth: {
-    login: '/auth/login',
-    register: '/auth/register',
-    logout: '/auth/logout',
+    login: '/login',
+    register: '/register',
+    logout: '/logout',
     refresh: '/auth/refresh',
-    forgotPassword: '/auth/forgot-password',
-    resetPassword: '/auth/reset-password',
-    verifyEmail: '/auth/verify-email',
+    forgotPassword: '/forgot-password',
+    resetPassword: '/reset-password',
+    verifyEmail: '/email/verification-notification',
   },
   
   // Users
   users: {
-    profile: '/users/profile',
-    updateProfile: '/users/profile',
+    profile: '/user',
+    updateProfile: '/user',
     changePassword: '/users/change-password',
     uploadAvatar: '/users/avatar',
   },
   
   // Projects
   projects: {
-    list: '/projects',
-    create: '/projects',
-    get: (id: string) => `/projects/${id}`,
-    update: (id: string) => `/projects/${id}`,
-    delete: (id: string) => `/projects/${id}`,
-    status: (id: string) => `/projects/${id}/status`,
+    list: '/userprojects',
+    create: '/userprojects',
+    get: (id: string) => `/userprojects/${id}`,
+    update: (id: string) => `/userprojects/${id}`,
+    delete: (id: string) => `/userprojects/${id}`,
+    status: (id: string) => `/userprojects/${id}/status`,
   },
   
   // Service Requests
   serviceRequests: {
-    list: '/service-requests',
-    create: '/service-requests',
-    get: (id: string) => `/service-requests/${id}`,
-    update: (id: string) => `/service-requests/${id}`,
-    delete: (id: string) => `/service-requests/${id}`,
-    status: (id: string) => `/service-requests/${id}/status`,
+    list: '/user_service-requests',
+    create: '/user_service-requests',
+    get: (id: string) => `/user_service-requests/${id}`,
+    update: (id: string) => `/user_service-requests/${id}`,
+    delete: (id: string) => `/user_service-requests/${id}`,
+    status: (id: string) => `/user_service-requests/${id}/status`,
   },
   
   // Messages
   messages: {
-    list: '/messages',
-    create: '/messages',
-    get: (id: string) => `/messages/${id}`,
-    delete: (id: string) => `/messages/${id}`,
-    markRead: (id: string) => `/messages/${id}/read`,
+    list: '/usermessages',
+    create: '/usermessages',
+    get: (id: string) => `/usermessages/${id}`,
+    delete: (id: string) => `/usermessages/${id}`,
+    markRead: (id: string) => `/usermessages/${id}/read`,
   },
   
   // Blog
   blog: {
     list: '/blog',
-    create: '/blog',
-    get: (id: string) => `/blog/${id}`,
-    update: (id: string) => `/blog/${id}`,
-    delete: (id: string) => `/blog/${id}`,
-    like: (id: string) => `/blog/${id}/like`,
-    view: (id: string) => `/blog/${id}/view`,
+    create: '/blogs',
+    get: (id: string) => `/blogs/${id}`,
+    update: (id: string) => `/blogs/${id}`,
+    delete: (id: string) => `/blogs/${id}`,
+    like: (id: string) => `/blogs/${id}/increment-likes`,
+    view: (id: string) => `/blogs/${id}/increment-views`,
   },
   
   // Admin
   admin: {
-    users: '/admin/users',
-    user: (id: string) => `/admin/users/${id}`,
+    users: '/users',
+    user: (id: string) => `/users/${id}`,
     projects: '/admin/projects',
     project: (id: string) => `/admin/projects/${id}`,
-    serviceRequests: '/admin/service-requests',
-    serviceRequest: (id: string) => `/admin/service-requests/${id}`,
+    serviceRequests: '/admin/services',
+    serviceRequest: (id: string) => `/admin/services/${id}`,
     messages: '/admin/messages',
     message: (id: string) => `/admin/messages/${id}`,
-    blog: '/admin/blog',
-    blogPost: (id: string) => `/admin/blog/${id}`,
-    analytics: '/admin/analytics',
-    team: '/admin/team',
-    teamMember: (id: string) => `/admin/team/${id}`,
+    blog: '/blogs',
+    blogPost: (id: string) => `/blogs/${id}`,
+    analytics: '/overview',
+    team: '/team-members',
+    teamMember: (id: string) => `/team-members/${id}`,
   },
   
   // Contact

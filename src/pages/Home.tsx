@@ -4,7 +4,6 @@ import Process from "@/components/Process";
 import Products from "@/components/Products";
 import Reviews from "@/components/Reviews";
 import Partners from "@/components/Partners";
-import HelpCenter from "@/components/HelpCenter";
 import Footer from "@/components/Footer";
 
 const Home = () => {
@@ -12,11 +11,11 @@ const Home = () => {
     <>
       <Header />
       <Hero id="home" />
+  {/* API Connection Test removed */}
       <Process />
       <Products />
       <Reviews />
       <Partners />
-      <HelpCenter />
       <Footer />
     </>
   );

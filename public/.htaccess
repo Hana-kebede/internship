@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Route all API requests to our custom API server
+RewriteCond %{REQUEST_URI} ^/api/
+RewriteRule ^api/(.*)$ api-server.php [QSA,L]
+
+# Handle other requests normally
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php [QSA,L]
+

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, User, Clock, ArrowRight, Search, Filter, Eye, Heart, ThumbsUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,138 +9,86 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-const blogPosts = [
-  {
-    id: 1,
-    title: "The Future of Web Development: Trends to Watch in 2024",
-    excerpt: "Explore the latest trends shaping the web development landscape, from AI integration to progressive web apps.",
-    content: "Full content here...",
-    author: "hana kebede",
-    date: "2024-01-15",
-    readTime: "5 min read",
-    category: "Web Development",
-    image: "https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=800&h=400&fit=crop",
-    tags: ["React", "AI", "PWA"],
-    likes: 245,
-    views: 1247,
-    isLiked: false
-  },
-  {
-    id: 2,
-    title: "Mobile App Development Best Practices",
-    excerpt: "Learn essential best practices for creating mobile applications that users love and engage with.",
-    content: "Full content here...",
-    author: "Ahmed Hassan",
-    date: "2024-01-12",
-    readTime: "7 min read",
-    category: "Mobile Development",
-    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=800&h=400&fit=crop",
-    tags: ["React Native", "Flutter", "UX"],
-    likes: 189,
-    views: 892,
-    isLiked: false
-  },
-  {
-    id: 3,
-    title: "Building Scalable Software Architecture",
-    excerpt: "Discover how to design software systems that can grow with your business needs.",
-    content: "Full content here...",
-    author: "Michael Chen",
-    date: "2024-01-10",
-    readTime: "8 min read",
-    category: "Software Architecture",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop",
-    tags: ["Architecture", "Scalability", "Backend"],
-    likes: 312,
-    views: 1567,
-    isLiked: false
-  },
-  {
-    id: 4,
-    title: "UI/UX Design Principles for Modern Applications",
-    excerpt: "Master the fundamental design principles that create exceptional user experiences.",
-    content: "Full content here...",
-    author: "Abebe Rodriguez",
-    date: "2024-01-08",
-    readTime: "6 min read",
-    category: "Design",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=400&fit=crop",
-    tags: ["UI/UX", "Design", "User Experience"],
-    likes: 178,
-    views: 945,
-    isLiked: false
-  },
-  {
-    id: 5,
-    title: "DevOps and Continuous Integration Strategies",
-    excerpt: "Streamline your development workflow with effective DevOps practices and CI/CD pipelines.",
-    content: "Full content here...",
-    author: "kebede Park",
-    date: "2024-01-05",
-    readTime: "9 min read",
-    category: "DevOps",
-    image: "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?w=800&h=400&fit=crop",
-    tags: ["DevOps", "CI/CD", "Automation"],
-    likes: 267,
-    views: 1134,
-    isLiked: false
-  },
-  {
-    id: 6,
-    title: "Cybersecurity in Software Development",
-    excerpt: "Essential security practices every developer should implement to protect applications and data.",
-    content: "Full content here...",
-    author: "Lisa Thompson",
-    date: "2024-01-03",
-    readTime: "10 min read",
-    category: "Security",
-    image: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=800&h=400&fit=crop",
-    tags: ["Security", "Development", "Best Practices"],
-    likes: 334,
-    views: 1789,
-    isLiked: false
-  }
-];
 
 const categories = ["All", "Web Development", "Mobile Development", "Software Architecture", "Design", "DevOps", "Security"];
+
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [readMoreOpen, setReadMoreOpen] = useState(false);
   const [readMorePost, setReadMorePost] = useState(null);
   const [articlesToShow, setArticlesToShow] = useState(4);
-  const [posts, setPosts] = useState(blogPosts);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleLike = (postId) => {
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : post.likes + 1 }
+  useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    import("@/lib/services").then(({ blogService }) => {
+      blogService.getBlogPosts({ page: 1, limit: 20 }).then(res => {
+        if (isMounted) {
+          if (res.success) {
+            setPosts(res.data || []);
+            setError("");
+          } else {
+            setError(res.error || "Failed to load blog posts");
+          }
+          setLoading(false);
+        }
+      }).catch(() => {
+        if (isMounted) {
+          setError("Failed to load blog posts");
+          setLoading(false);
+        }
+      });
+    });
+    return () => { isMounted = false; };
+  }, []);
+
+  const handleLike = (postId: string) => {
+    setPosts(posts.map(post =>
+      post.id === postId
+        ? { ...post, isLiked: !post.isLiked, likes: post.isLiked ? post.likes - 1 : (post.likes || 0) + 1 }
         : post
     ));
   };
 
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = posts.filter((post: any) => {
     const matchesCategory = selectedCategory === "All" || post.category === selectedCategory;
     return matchesCategory;
   });
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span>Loading blog posts...</span>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        <span>{error}</span>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Header />
-      
-             {/* Hero Section */}
-       <section className="pt-32 pb-20 bg-gradient-to-br from-primary/5 to-secondary/5 relative z-10">
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 bg-gradient-to-br from-primary/5 to-secondary/5 relative z-10">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-4xl mx-auto animate-fade-in">
             <div className="mb-8">
-                             <h1 className="text-4xl md:text-5xl font-bold mb-6 gradient-text leading-tight tracking-wide font-extrabold relative z-10">
-                 Our Blog
-               </h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 gradient-text leading-tight tracking-wide font-extrabold relative z-10">
+                Our Blog
+              </h1>
               <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
                 Industry insights, development tips, and the latest technology updates from our expert team
               </p>
             </div>
-            
             {/* Search and Filter */}
             <div className="flex flex-col md:flex-row gap-4 max-w-3xl mx-auto">
               <div className="flex gap-2 flex-wrap justify-center">
@@ -162,62 +110,65 @@ const Blog = () => {
       </section>
 
       {/* Featured Post */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Featured Article</h2>
-          <Card className="glass-card hover-scale max-w-4xl mx-auto animate-slide-in-up">
-            <div className="md:flex">
-              <div className="md:w-1/2">
-                <img
-                  src={filteredPosts[0].image}
-                  alt={filteredPosts[0].title}
-                  className="w-full h-64 md:h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
-                />
-              </div>
-              <div className="md:w-1/2 p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <Badge variant="secondary">{filteredPosts[0].category}</Badge>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    {new Date(filteredPosts[0].date).toLocaleDateString()}
-                  </div>
+      {/* Featured Post (guarded) */}
+      {filteredPosts.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold mb-8 text-center">Featured Article</h2>
+            <Card className="glass-card hover-scale max-w-4xl mx-auto animate-slide-in-up">
+              <div className="md:flex">
+                <div className="md:w-1/2">
+                  <img
+                    src={filteredPosts[0].image}
+                    alt={filteredPosts[0].title}
+                    className="w-full h-64 md:h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-t-none"
+                  />
                 </div>
-                <h3 className="text-2xl font-bold mb-4">{filteredPosts[0].title}</h3>
-                <p className="text-muted-foreground mb-6">{filteredPosts[0].excerpt}</p>
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span className="text-sm">{filteredPosts[0].author}</span>
-                    <Clock className="h-4 w-4 ml-2" />
-                    <span className="text-sm">{filteredPosts[0].readTime}</span>
+                <div className="md:w-1/2 p-6">
+                  <div className="flex items-center gap-4 mb-4">
+                    <Badge variant="secondary">{filteredPosts[0].category}</Badge>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Calendar className="h-4 w-4" />
+                      {new Date(filteredPosts[0].date).toLocaleDateString()}
+                    </div>
                   </div>
-                  <Button className="group" onClick={() => { setReadMorePost(filteredPosts[0]); setReadMoreOpen(true); }}>
-                    Read More
-                    <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Eye className="h-4 w-4" />
-                    <span>{filteredPosts[0].views} views</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className={`p-1 h-auto ${filteredPosts[0].isLiked ? 'text-red-500' : 'text-muted-foreground'}`}
-                      onClick={() => handleLike(filteredPosts[0].id)}
-                    >
-                      <Heart className={`h-4 w-4 ${filteredPosts[0].isLiked ? 'fill-current' : ''}`} />
+                  <h3 className="text-2xl font-bold mb-4">{filteredPosts[0].title}</h3>
+                  <p className="text-muted-foreground mb-6">{filteredPosts[0].excerpt}</p>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm">{filteredPosts[0].author}</span>
+                      <Clock className="h-4 w-4 ml-2" />
+                      <span className="text-sm">{filteredPosts[0].readTime}</span>
+                    </div>
+                    <Button className="group" onClick={() => { setReadMorePost(filteredPosts[0]); setReadMoreOpen(true); }}>
+                      Read More
+                      <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    <span>{filteredPosts[0].likes} likes</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Eye className="h-4 w-4" />
+                      <span>{filteredPosts[0].views} views</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className={`p-1 h-auto ${filteredPosts[0].isLiked ? 'text-red-500' : 'text-muted-foreground'}`}
+                        onClick={() => handleLike(filteredPosts[0].id)}
+                      >
+                        <Heart className={`h-4 w-4 ${filteredPosts[0].isLiked ? 'fill-current' : ''}`} />
+                      </Button>
+                      <span>{filteredPosts[0].likes} likes</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </Card>
-        </div>
-      </section>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* Blog Grid */}
       <section className="py-16 bg-muted/20">
@@ -250,7 +201,7 @@ const Blog = () => {
                     <h3 className="text-xl font-semibold mb-3 line-clamp-2">{post.title}</h3>
                     <p className="text-muted-foreground mb-4 line-clamp-3">{post.excerpt}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {post.tags.map((tag) => (
+                      {Array.isArray(post.tags) && post.tags.map((tag) => (
                         <Badge key={tag} variant="outline" className="text-xs">
                           {tag}
                         </Badge>

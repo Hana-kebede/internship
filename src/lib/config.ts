@@ -1,21 +1,44 @@
-// Configuration for API and development settings
+// Configuration for the application
 export const config = {
-  // Set to false to use mock functionality instead of real API calls
-  useRealApi: false,
+  // API Configuration
+  api: {
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+    timeout: 10000,
+  },
   
-  // API base URL (only used when useRealApi is true)
-  apiUrl: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  // App Configuration
+  app: {
+    name: 'Hawi Software',
+    version: '1.0.0',
+    environment: import.meta.env.MODE,
+  },
   
-  // Development mode
-  isDev: import.meta.env.DEV,
+  // Development Configuration
+  dev: {
+    enableMockApi: false, // Always disable mock API for production
+    enableDebug: import.meta.env.VITE_DEV_MODE === 'true',
+  },
   
-  // Mock delay for simulated API calls (in milliseconds)
-  mockDelay: 1000,
-  
-  // Feature flags
-  features: {
-    enableAnalytics: false,
-    enableErrorTracking: false,
-    enableFileUpload: false,
+  // File Upload Configuration
+  upload: {
+    maxFileSize: parseInt(import.meta.env.VITE_MAX_FILE_SIZE || '5242880'),
+    allowedTypes: import.meta.env.VITE_ALLOWED_FILE_TYPES?.split(',') || [
+      'image/jpeg',
+      'image/png', 
+      'image/gif',
+      'application/pdf'
+    ],
   }
 };
+
+// Ensure API URL is set correctly for Laravel backend
+if (!import.meta.env.VITE_API_URL) {
+  console.warn('VITE_API_URL not set, using default: http://localhost:8000/api');
+}
+
+// Log configuration for debugging
+console.log('API Configuration:', {
+  baseURL: config.api.baseURL,
+  mockApiEnabled: config.dev.enableMockApi,
+  environment: config.app.environment
+});
